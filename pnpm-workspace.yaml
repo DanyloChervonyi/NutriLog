@@ -1,2 +1,25 @@
 packages:
   - apps/*
+
+catalog:
+  typescript: ^5.9.3
+
+overrides:
+  deepmerge-ts: ^8.0.0
+  mysql2: ^3.23.1
+  js-yaml@5: ^5.4.1
+
+packageExtensions:
+  '@unocss/vite':
+    peerDependenciesMeta:
+      vite:
+        optional: true
+
+strictDepBuilds: true
+onlyBuiltDependencies:
+  - '@prisma/engines@7.10.0'
+  - 'argon2@0.45.1'
+  - 'prisma@7.10.0'
+ignoredBuiltDependencies:
+  - '@scarf/scarf'
+  - 'unrs-resolver'

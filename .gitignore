@@ -26,6 +26,7 @@ pnpm-debug.log*
 .turbo/
 .cache/
 .eslintcache
+apps/api/generated/
 
 # Editor and operating system files
 .idea/

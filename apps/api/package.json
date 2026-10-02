@@ -1,5 +1,54 @@
 {
   "name": "@nutrilog/api",
   "version": "0.1.0",
-  "private": true
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "nest start",
+    "start:dev": "nest start --watch",
+    "start:prod": "node dist/main.js",
+    "build": "nest build",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev"
+  },
+  "dependencies": {
+    "@nestjs/common": "^11.2.7",
+    "@nestjs/config": "12.0.1",
+    "@nestjs/core": "^11.2.7",
+    "@nestjs/jwt": "12.0.2",
+    "@nestjs/passport": "12.0.0",
+    "@nestjs/platform-express": "^11.2.7",
+    "@nestjs/swagger": "11.4.7",
+    "@nestjs/throttler": "6.7.1",
+    "@prisma/adapter-pg": "^7.10.0",
+    "@prisma/client": "^7.10.0",
+    "argon2": "0.45.1",
+    "class-transformer": "0.5.1",
+    "class-validator": "0.15.1",
+    "dotenv": "18.0.5",
+    "helmet": "8.3.0",
+    "ioredis": "6.0.0",
+    "passport": "0.7.0",
+    "passport-google-oauth20": "2.0.0",
+    "passport-jwt": "4.0.1",
+    "pg": "8.23.1",
+    "reflect-metadata": "0.2.2",
+    "rxjs": "7.8.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9",
+    "@nestjs/cli": "^11",
+    "@nestjs/schematics": "^11",
+    "@types/express": "5.0.6",
+    "@types/node": "26.6.4",
+    "@types/passport-google-oauth20": "2.0.17",
+    "@types/passport-jwt": "4.0.1",
+    "eslint": "^9",
+    "globals": "17.13.0",
+    "prisma": "^7.10",
+    "typescript": "catalog:",
+    "typescript-eslint": "8.71.0"
+  }
 }

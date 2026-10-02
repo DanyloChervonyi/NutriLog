@@ -2,5 +2,16 @@
   "name": "nutrilog",
   "version": "0.1.0",
   "private": true,
-  "description": "NutriLog monorepo"
+  "description": "NutriLog monorepo",
+  "packageManager": "pnpm@10.33.0",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev:web": "pnpm --filter @nutrilog/web dev",
+    "dev:api": "pnpm --filter @nutrilog/api start:dev",
+    "build": "pnpm --recursive --if-present build",
+    "typecheck": "pnpm --recursive --if-present typecheck",
+    "lint": "pnpm --recursive --if-present lint"
+  }
 }
