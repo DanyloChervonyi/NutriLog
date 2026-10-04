@@ -1,0 +1,17 @@
+{
+  "metadata": {
+    "title": "NutriLog — nutrition diary",
+    "description": "Your personal nutrition and macro diary"
+  },
+  "home": {
+    "eyebrow": "Nutrition diary",
+    "title": "NutriLog",
+    "description": "The app foundation is ready. Next, we will add your profile and calculate personalized nutrition targets."
+  },
+  "language": {
+    "label": "Language",
+    "ru": "Русский",
+    "uk": "Українська",
+    "en": "English"
+  }
+}
