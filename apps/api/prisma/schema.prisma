@@ -6,3 +6,175 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+enum UserRole {
+  USER
+  PREMIUM
+  ADMIN
+
+  @@map("user_role")
+}
+
+enum AuthProvider {
+  LOCAL
+  GOOGLE
+
+  @@map("auth_provider")
+}
+
+enum Gender {
+  MALE
+  FEMALE
+
+  @@map("gender")
+}
+
+enum Goal {
+  CUT
+  MAINTAIN
+  BULK
+
+  @@map("goal")
+}
+
+enum ActivityLevel {
+  LOW
+  MEDIUM
+  HIGH
+  VERY_HIGH
+
+  @@map("activity_level")
+}
+
+enum MealType {
+  BREAKFAST
+  LUNCH
+  DINNER
+  SNACK
+
+  @@map("meal_type")
+}
+
+model User {
+  id           String       @id @default(uuid()) @db.Uuid
+  email        String       @unique @db.VarChar(320)
+  passwordHash String?      @map("password_hash") @db.VarChar(255)
+  provider     AuthProvider @default(LOCAL)
+  role         UserRole     @default(USER)
+  firstName    String?      @map("first_name") @db.VarChar(100)
+  lastName     String?      @map("last_name") @db.VarChar(100)
+  createdAt    DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt    DateTime     @updatedAt @map("updated_at") @db.Timestamptz(3)
+  profile      UserProfile?
+  foods        Food[]
+  diaryDays    DiaryDay[]
+
+  @@map("users")
+}
+
+model UserProfile {
+  id                String        @id @default(uuid()) @db.Uuid
+  userId            String        @unique @map("user_id") @db.Uuid
+  gender            Gender
+  age               Int
+  heightCm          Decimal       @map("height_cm") @db.Decimal(6, 2)
+  weightKg          Decimal       @map("weight_kg") @db.Decimal(6, 2)
+  goalWeight        Decimal?      @map("goal_weight") @db.Decimal(6, 2)
+  goal              Goal
+  activityLevel     ActivityLevel @map("activity_level")
+  dailyCaloriesGoal Int?          @map("daily_calories_goal")
+  proteinGoal       Decimal?      @map("protein_goal") @db.Decimal(8, 2)
+  fatGoal           Decimal?      @map("fat_goal") @db.Decimal(8, 2)
+  carbsGoal         Decimal?      @map("carbs_goal") @db.Decimal(8, 2)
+  updatedAt         DateTime      @updatedAt @map("updated_at") @db.Timestamptz(3)
+  user              User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_profiles")
+}
+
+model Food {
+  id          String     @id @default(uuid()) @db.Uuid
+  name        String     @db.VarChar(200)
+  brand       String?    @db.VarChar(120)
+  category    String?    @db.VarChar(80)
+  calories    Decimal    @db.Decimal(8, 2)
+  protein     Decimal    @db.Decimal(8, 2)
+  fat         Decimal    @db.Decimal(8, 2)
+  carbs       Decimal    @db.Decimal(8, 2)
+  fiber       Decimal?   @db.Decimal(8, 2)
+  sugar       Decimal?   @db.Decimal(8, 2)
+  potassium   Decimal?   @db.Decimal(10, 3)
+  magnesium   Decimal?   @db.Decimal(10, 3)
+  iron        Decimal?   @db.Decimal(10, 3)
+  calcium     Decimal?   @db.Decimal(10, 3)
+  vitaminA    Decimal?   @map("vitamin_a") @db.Decimal(10, 3)
+  vitaminC    Decimal?   @map("vitamin_c") @db.Decimal(10, 3)
+  vitaminD    Decimal?   @map("vitamin_d") @db.Decimal(10, 3)
+  servingSize Decimal?   @map("serving_size") @db.Decimal(8, 2)
+  isVerified  Boolean    @default(false) @map("is_verified")
+  createdById String?    @map("created_by") @db.Uuid
+  createdAt   DateTime   @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime   @updatedAt @map("updated_at") @db.Timestamptz(3)
+  createdBy   User?      @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  mealItems   MealItem[]
+
+  @@index([name])
+  @@index([category, isVerified])
+  @@index([createdById])
+  @@map("foods")
+}
+
+model DiaryDay {
+  id            String   @id @default(uuid()) @db.Uuid
+  userId        String   @map("user_id") @db.Uuid
+  entryDate     DateTime @map("entry_date") @db.Date
+  totalCalories Int      @default(0) @map("total_calories")
+  totalProtein  Decimal  @default(0) @map("total_protein") @db.Decimal(10, 2)
+  totalFat      Decimal  @default(0) @map("total_fat") @db.Decimal(10, 2)
+  totalCarbs    Decimal  @default(0) @map("total_carbs") @db.Decimal(10, 2)
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  meals         Meal[]
+
+  @@unique([userId, entryDate])
+  @@map("diary_days")
+}
+
+model Meal {
+  id         String     @id @default(uuid()) @db.Uuid
+  diaryDayId String     @map("diary_day_id") @db.Uuid
+  type       MealType   @map("meal_type")
+  createdAt  DateTime   @default(now()) @map("created_at") @db.Timestamptz(3)
+  diaryDay   DiaryDay   @relation(fields: [diaryDayId], references: [id], onDelete: Cascade)
+  items      MealItem[]
+
+  @@index([diaryDayId, type])
+  @@map("meals")
+}
+
+model MealItem {
+  id        String   @id @default(uuid()) @db.Uuid
+  mealId    String   @map("meal_id") @db.Uuid
+  foodId    String   @map("food_id") @db.Uuid
+  grams     Decimal  @db.Decimal(8, 2)
+  calories  Int
+  protein   Decimal  @db.Decimal(10, 2)
+  fat       Decimal  @db.Decimal(10, 2)
+  carbs     Decimal  @db.Decimal(10, 2)
+  fiber     Decimal? @db.Decimal(10, 2)
+  sugar     Decimal? @db.Decimal(10, 2)
+  potassium Decimal? @db.Decimal(10, 3)
+  magnesium Decimal? @db.Decimal(10, 3)
+  iron      Decimal? @db.Decimal(10, 3)
+  calcium   Decimal? @db.Decimal(10, 3)
+  vitaminA  Decimal? @map("vitamin_a") @db.Decimal(10, 3)
+  vitaminC  Decimal? @map("vitamin_c") @db.Decimal(10, 3)
+  vitaminD  Decimal? @map("vitamin_d") @db.Decimal(10, 3)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  meal      Meal     @relation(fields: [mealId], references: [id], onDelete: Cascade)
+  food      Food     @relation(fields: [foodId], references: [id], onDelete: Restrict)
+
+  @@index([mealId])
+  @@index([foodId])
+  @@map("meal_items")
+}
