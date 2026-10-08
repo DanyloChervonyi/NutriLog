@@ -1,6 +1,7 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import { AppModule } from './app.module.js';
 
@@ -9,6 +10,7 @@ async function bootstrap(): Promise<void> {
   const isProduction = process.env.NODE_ENV === 'production';
 
   app.use(helmet({ contentSecurityPolicy: isProduction ? undefined : false }));
+  app.use(cookieParser());
   app.setGlobalPrefix('api/v1');
   app.enableCors({
     origin: process.env.WEB_ORIGIN ?? 'http://localhost:3000',
