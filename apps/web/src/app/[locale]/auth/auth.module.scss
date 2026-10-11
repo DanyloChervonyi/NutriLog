@@ -1,0 +1,72 @@
+.page {
+  display: grid;
+  min-height: 100vh;
+  place-items: center;
+  padding: 24px;
+}
+
+.form {
+  width: min(100%, 420px);
+  display: grid;
+  gap: 16px;
+}
+
+.form h1 {
+  margin: 0;
+  font-size: 28px;
+}
+
+.form p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.field {
+  display: grid;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.field input {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid #cbd5cf;
+  border-radius: 4px;
+  padding: 0 12px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+}
+
+.button {
+  display: grid;
+  align-items: center;
+  text-align: center;
+  text-decoration: none;
+  min-height: 44px;
+  border: 0;
+  border-radius: 4px;
+  padding: 0 16px;
+  background: var(--accent);
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.secondary {
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid #cbd5cf;
+}
+
+.link {
+  color: var(--accent-strong);
+  text-underline-offset: 3px;
+}
+
+.message {
+  min-height: 1.5em;
+  color: var(--accent-strong) !important;
+}
