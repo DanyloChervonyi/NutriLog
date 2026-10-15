@@ -1,8 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { PassportStrategy } from '@nestjs/passport';
-import { Strategy, type Profile } from 'passport-google-oauth20';
-import { GoogleStateStore } from './google-state.store.js';
+import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { PassportStrategy } from "@nestjs/passport";
+import { Strategy, type Profile } from "passport-google-oauth20";
+import { GoogleStateStore } from "./google-state.store.js";
 
 export type GoogleIdentity = Readonly<{
   googleId: string;
@@ -12,18 +12,19 @@ export type GoogleIdentity = Readonly<{
 }>;
 
 @Injectable()
-export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
+export class GoogleStrategy extends PassportStrategy(Strategy, "google") {
   constructor(config: ConfigService) {
     super({
-      clientID: config.get<string>('GOOGLE_CLIENT_ID') || 'not-configured',
-      clientSecret: config.get<string>('GOOGLE_CLIENT_SECRET') || 'not-configured',
+      clientID: config.get<string>("GOOGLE_CLIENT_ID") || "not-configured",
+      clientSecret:
+        config.get<string>("GOOGLE_CLIENT_SECRET") || "not-configured",
       callbackURL:
-        config.get<string>('GOOGLE_CALLBACK_URL') ??
-        'http://localhost:4000/api/v1/auth/google/callback',
-      scope: ['email', 'profile'],
+        config.get<string>("GOOGLE_CALLBACK_URL") ??
+        "http://localhost:4000/api/v1/auth/google/callback",
+      scope: ["email", "profile"],
       state: true,
       store: new GoogleStateStore() as NonNullable<
-        ConstructorParameters<typeof Strategy>[0]['store']
+        ConstructorParameters<typeof Strategy>[0]["store"]
       >,
     });
   }
@@ -36,9 +37,10 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     const email = profile.emails?.find((item) => item.verified)?.value;
     const verified = profile._json.email_verified === true;
 
-    if (!email || !verified || !profile.id) {
-      throw new UnauthorizedException('Google account must provide a verified email');
-    }
+    if (!email || !verified || !profile.id)
+      throw new UnauthorizedException(
+        "Google account must provide a verified email",
+      );
 
     return {
       googleId: profile.id,

@@ -39,6 +39,17 @@
   font: inherit;
 }
 
+.field select {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid #cbd5cf;
+  border-radius: 4px;
+  padding: 0 12px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+}
+
 .button {
   display: grid;
   align-items: center;

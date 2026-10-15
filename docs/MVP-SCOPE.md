@@ -30,3 +30,11 @@ The MVP is complete when a user can register and authenticate, receive personali
 
 - The specification requires Google OAuth in the MVP; Apple OAuth remains future scope.
 - The specification names the BMR formula and the expected daily targets but does not define the exact protein, fat, and carbohydrate allocation rules. Define and document those rules in the nutrition implementation before exposing the calculated targets.
+
+## Nutrition calculation rules
+
+- BMR uses Mifflin-St Jeor: 10 × weightKg + 6.25 × heightCm - 5 × age + 5 for male profiles and the same expression with -161 for female profiles.
+- Activity multipliers are LOW 1.2, MEDIUM 1.375, HIGH 1.55, and VERY_HIGH 1.725. TDEE is BMR multiplied by the selected activity factor.
+- CUT applies 0.8 × TDEE, MAINTAIN applies 1.0 × TDEE, and BULK applies 1.1 × TDEE. The resulting daily calorie target is rounded to the nearest 10 kcal.
+- Macro targets divide target energy as 30% protein, 30% fat, and 40% carbohydrates. Convert energy to grams using 4 kcal/g for protein and carbohydrates and 9 kcal/g for fat; store grams to two decimal places.
+- These are deterministic product defaults, not medical advice. Inputs are validated to age 13–120 years, height 100–250 cm, and weight 25–350 kg. Updating any input recalculates and persists all four daily targets.

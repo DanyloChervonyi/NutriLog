@@ -7,7 +7,8 @@
     "eyebrow": "Nutrition diary",
     "title": "NutriLog",
     "description": "The app foundation is ready. Next, we will add your profile and calculate personalized nutrition targets.",
-    "signIn": "Sign in"
+    "signIn": "Sign in",
+    "profile": "Profile"
   },
   "language": {
     "label": "Language",
@@ -34,5 +35,35 @@
     "requestFailed": "The request failed. Please try again later.",
     "googleFailed": "Google sign-in failed. Please try again.",
     "signingIn": "Signing in…"
+  },
+  "profile": {
+    "title": "Profile and daily targets",
+    "gender": "Sex",
+    "male": "Male",
+    "female": "Female",
+    "age": "Age, years",
+    "height": "Height, cm",
+    "weight": "Weight, kg",
+    "activity": "Activity level",
+    "low": "Low",
+    "medium": "Moderate",
+    "high": "High",
+    "veryHigh": "Very high",
+    "goal": "Goal",
+    "cut": "Lose weight",
+    "maintain": "Maintain weight",
+    "bulk": "Gain weight",
+    "save": "Save profile",
+    "loading": "Loading profile…",
+    "failed": "Could not load or save the profile.",
+    "signIn": "Sign in to complete your profile",
+    "targets": "Calculated targets",
+    "bmr": "BMR",
+    "tdee": "TDEE",
+    "calories": "Calories",
+    "protein": "Protein",
+    "fat": "Fat",
+    "carbs": "Carbohydrates",
+    "saved": "Profile and daily targets saved."
   }
 }
