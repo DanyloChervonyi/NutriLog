@@ -31,6 +31,13 @@ The MVP is complete when a user can register and authenticate, receive personali
 - The specification requires Google OAuth in the MVP; Apple OAuth remains future scope.
 - The specification names the BMR formula and the expected daily targets but does not define the exact protein, fat, and carbohydrate allocation rules. Define and document those rules in the nutrition implementation before exposing the calculated targets.
 
+## Food catalog implementation
+
+- The starter catalog is populated by a Prisma migration and stores nutrition values per 100 g. Generic values are reference estimates; raw and cooked foods are separate entries.
+- GET /api/v1/foods/search?q=...&page=1&pageSize=20 performs a case-insensitive substring search and returns an ordered page with total counts. pageSize is limited to 50.
+- Successful search pages are cached in Redis for 60 seconds by normalized query, page, and page size. If Redis is unavailable, the API continues to query PostgreSQL.
+- The web catalog displays calories and macros per 100 g and lets the user select a food for a diary entry. Persisting meals and portions belongs to the following diary stage.
+
 ## Nutrition calculation rules
 
 - BMR uses Mifflin-St Jeor: 10 × weightKg + 6.25 × heightCm - 5 × age + 5 for male profiles and the same expression with -161 for female profiles.

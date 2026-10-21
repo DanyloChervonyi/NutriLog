@@ -6,9 +6,10 @@
   "home": {
     "eyebrow": "Nutrition diary",
     "title": "NutriLog",
-    "description": "The app foundation is ready. Next, we will add your profile and calculate personalized nutrition targets.",
+    "description": "Personal nutrition targets and food search for your daily diary.",
     "signIn": "Sign in",
-    "profile": "Profile"
+    "profile": "Profile",
+    "catalog": "Foods"
   },
   "language": {
     "label": "Language",
@@ -65,5 +66,23 @@
     "fat": "Fat",
     "carbs": "Carbohydrates",
     "saved": "Profile and daily targets saved."
+  },
+  "catalog": {
+    "title": "Food catalog",
+    "searchPlaceholder": "Search foods",
+    "noResults": "No foods found.",
+    "loading": "Searching foods…",
+    "error": "Could not search foods.",
+    "calories": "Calories",
+    "protein": "Protein",
+    "fat": "Fat",
+    "carbs": "Carbohydrates",
+    "per100g": "Per 100 g",
+    "select": "Select",
+    "selected": "Selected for diary",
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page",
+    "of": "of"
   }
 }

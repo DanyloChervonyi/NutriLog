@@ -15,14 +15,19 @@ type Labels = Record<string, string>;
 export function ProfileForm({ labels }: { labels: Labels }) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [values, setValues] = useState({ gender: 'FEMALE', age: '', heightCm: '', weightKg: '', activityLevel: 'LOW', goal: 'MAINTAIN' });
-  const [authorized, setAuthorized] = useState(true);
+  const [sessionToken, setSessionToken] = useState<string | null | undefined>(undefined);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    const token = window.sessionStorage.getItem('nutrilog_access_token');
-    if (!token) { setAuthorized(false); setLoading(false); return; }
-    apiClient.get<Profile | null>('/profile', { headers: { Authorization: 'Bearer ' + token } })
+    Promise.resolve().then(() => {
+      setSessionToken(window.sessionStorage.getItem('nutrilog_access_token'));
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!sessionToken) return;
+    apiClient.get<Profile | null>('/profile', { headers: { Authorization: 'Bearer ' + sessionToken } })
       .then(({ data }) => {
         if (!data) return;
         setProfile(data);
@@ -30,17 +35,16 @@ export function ProfileForm({ labels }: { labels: Labels }) {
       })
       .catch(() => setMessage(labels.failed))
       .finally(() => setLoading(false));
-  }, [labels.failed]);
+  }, [labels.failed, sessionToken]);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const token = window.sessionStorage.getItem('nutrilog_access_token');
-    if (!token) { setAuthorized(false); return; }
+    if (!sessionToken) return;
     setMessage('');
     try {
       const { data } = await apiClient.put<Profile>('/profile', {
         ...values, age: Number(values.age), heightCm: Number(values.heightCm), weightKg: Number(values.weightKg),
-      }, { headers: { Authorization: 'Bearer ' + token } });
+      }, { headers: { Authorization: 'Bearer ' + sessionToken } });
       setProfile(data);
       setMessage(labels.saved);
     } catch {
@@ -48,8 +52,8 @@ export function ProfileForm({ labels }: { labels: Labels }) {
     }
   }
 
-  if (loading) return <p>{labels.loading}</p>;
-  if (!authorized) return <section className={styles.form}><h1>{labels.title}</h1><Link className={styles.link} href="/login">{labels.signIn}</Link></section>;
+  if (sessionToken === undefined || (sessionToken !== null && loading)) return <p>{labels.loading}</p>;
+  if (sessionToken === null) return <section className={styles.form}><h1>{labels.title}</h1><Link className={styles.link} href="/login">{labels.signIn}</Link></section>;
 
   const field = (key: string, label: string, options: Array<[string, string]>) => (
     <label className={styles.field} key={key}>{label}<select value={values[key as keyof typeof values]} onChange={(event) => setValues({ ...values, [key]: event.target.value })}>

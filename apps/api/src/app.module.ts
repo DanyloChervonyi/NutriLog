@@ -7,6 +7,8 @@ import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 import { PrismaModule } from './prisma/prisma.module.js';
 import { ProfileModule } from './profile/profile.module.js';
+import { FoodsModule } from './foods/foods.module.js';
+import { RedisCacheModule } from './redis-cache/redis-cache.module.js';
 
 @Module({
   imports: [
@@ -15,6 +17,8 @@ import { ProfileModule } from './profile/profile.module.js';
     ThrottlerModule.forRoot([{ ttl: 60_000, limit: 120 }]),
     AuthModule,
     ProfileModule,
+    FoodsModule,
+    RedisCacheModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_GUARD, useClass: ThrottlerGuard }],

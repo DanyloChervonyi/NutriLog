@@ -14,6 +14,7 @@ export default async function HomePage() {
         </a>
         <LocaleSwitcher />
         <Link href="/profile">{t('profile')}</Link>
+        <Link href="/catalog">{t('catalog')}</Link>
         <Link href="/login">{t('signIn')}</Link>
       </header>
       <section className={styles.intro} aria-labelledby="page-title">
