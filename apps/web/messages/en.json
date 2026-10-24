@@ -9,7 +9,8 @@
     "description": "Personal nutrition targets and food search for your daily diary.",
     "signIn": "Sign in",
     "profile": "Profile",
-    "catalog": "Foods"
+    "catalog": "Foods",
+    "diary": "Diary"
   },
   "language": {
     "label": "Language",
@@ -84,5 +85,34 @@
     "next": "Next",
     "page": "Page",
     "of": "of"
+  },
+  "diary": {
+    "title": "Nutrition diary",
+    "date": "Date",
+    "addFood": "Add food",
+    "search": "Search catalog",
+    "searchHint": "Enter at least 2 characters",
+    "select": "Select",
+    "grams": "Grams",
+    "add": "Add",
+    "loading": "Loading…",
+    "failed": "Could not update the diary.",
+    "signIn": "Sign in to open your diary",
+    "noMeals": "No foods in this meal yet.",
+    "createMeal": "Create meal",
+    "breakfast": "Breakfast",
+    "lunch": "Lunch",
+    "dinner": "Dinner",
+    "snack": "Snack",
+    "calories": "Calories",
+    "protein": "Protein",
+    "fat": "Fat",
+    "carbs": "Carbohydrates",
+    "totals": "Daily total",
+    "goals": "Goals",
+    "save": "Save",
+    "remove": "Delete",
+    "foodSearchError": "Could not search foods.",
+    "noFoods": "No foods found."
   }
 }

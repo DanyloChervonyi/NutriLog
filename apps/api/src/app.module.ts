@@ -9,6 +9,7 @@ import { PrismaModule } from './prisma/prisma.module.js';
 import { ProfileModule } from './profile/profile.module.js';
 import { FoodsModule } from './foods/foods.module.js';
 import { RedisCacheModule } from './redis-cache/redis-cache.module.js';
+import { DiaryModule } from './diary/diary.module.js';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { RedisCacheModule } from './redis-cache/redis-cache.module.js';
     ProfileModule,
     FoodsModule,
     RedisCacheModule,
+    DiaryModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_GUARD, useClass: ThrottlerGuard }],
