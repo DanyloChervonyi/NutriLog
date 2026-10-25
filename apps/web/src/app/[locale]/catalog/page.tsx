@@ -11,6 +11,7 @@ export default async function CatalogPage() {
         loading: t('loading'), error: t('error'), calories: t('calories'), protein: t('protein'),
         fat: t('fat'), carbs: t('carbs'), per100g: t('per100g'), select: t('select'),
         selected: t('selected'), previous: t('previous'), next: t('next'), page: t('page'), of: t('of'),
+        addToDiary: t('addToDiary'),
       }} />
     </main>
   );

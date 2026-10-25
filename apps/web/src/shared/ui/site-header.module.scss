@@ -1,0 +1,22 @@
+.header {
+  width: min(1120px, calc(100% - 32px));
+  min-height: 64px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  border-bottom: 1px solid #e5e9e5;
+}
+
+.brand { color: #195c3d; font-weight: 700; text-decoration: none; }
+.nav, .actions { display: flex; align-items: center; gap: 16px; }
+.nav { flex: 1; }
+.actions { margin-left: auto; }
+.nav a, .actions a, .actions button { color: inherit; font: inherit; text-decoration: none; }
+.actions button { border: 0; background: transparent; cursor: pointer; }
+
+@media (max-width: 620px) {
+  .header { width: calc(100% - 24px); min-height: 58px; flex-wrap: wrap; gap: 10px 16px; padding: 10px 0; }
+  .nav { order: 3; width: 100%; gap: 18px; }
+  .actions { gap: 10px; }
+}

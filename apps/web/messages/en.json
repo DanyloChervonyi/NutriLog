@@ -36,7 +36,12 @@
     "resetFailed": "This link is invalid or has expired.",
     "requestFailed": "The request failed. Please try again later.",
     "googleFailed": "Google sign-in failed. Please try again.",
-    "signingIn": "Signing in…"
+    "signingIn": "Signing in…",
+    "registerTitle": "Create your NutriLog account",
+    "register": "Create account",
+    "firstName": "First name (optional)",
+    "lastName": "Last name (optional)",
+    "createAccount": "Create an account"
   },
   "profile": {
     "title": "Profile and daily targets",
@@ -84,7 +89,8 @@
     "previous": "Previous",
     "next": "Next",
     "page": "Page",
-    "of": "of"
+    "of": "of",
+    "addToDiary": "Add to diary"
   },
   "diary": {
     "title": "Nutrition diary",
@@ -113,6 +119,17 @@
     "save": "Save",
     "remove": "Delete",
     "foodSearchError": "Could not search foods.",
-    "noFoods": "No foods found."
+    "noFoods": "No foods found.",
+    "previousDay": "Previous day",
+    "nextDay": "Next day",
+    "remaining": "Remaining to goal"
+  },
+  "navigation": {
+    "diary": "Diary",
+    "profile": "Profile",
+    "catalog": "Foods",
+    "signIn": "Sign in",
+    "register": "Register",
+    "signOut": "Sign out"
   }
 }

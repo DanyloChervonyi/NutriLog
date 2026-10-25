@@ -1,8 +1,12 @@
 'use client';
 
-import { useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
 import { Link } from '../../../../i18n/navigation';
 import { apiClient } from '../../../shared/api/client';
+import { useAuth } from '../../../shared/auth/auth-context';
 import styles from './diary.module.scss';
 
 type MealType = 'BREAKFAST' | 'LUNCH' | 'DINNER' | 'SNACK';
@@ -22,80 +26,86 @@ const mealTypes: MealType[] = ['BREAKFAST', 'LUNCH', 'DINNER', 'SNACK'];
 const typeLabel: Record<MealType, string> = {
   BREAKFAST: 'breakfast', LUNCH: 'lunch', DINNER: 'dinner', SNACK: 'snack',
 };
+const pendingFoodSchema = z.object({ id: z.string(), name: z.string(), brand: z.string().nullable().optional(), calories: z.number(), protein: z.number(), fat: z.number(), carbs: z.number() });
 
 export function DiaryView({ labels }: { labels: Labels }) {
-  const [token, setToken] = useState<string | null | undefined>(undefined);
+  const { accessToken: token, ready } = useAuth();
+  const queryClient = useQueryClient();
   const [date, setDate] = useState(localDate());
-  const [diary, setDiary] = useState<Diary | null>(null);
   const [query, setQuery] = useState('');
-  const [foods, setFoods] = useState<Food[]>([]);
+  const [debouncedQuery, setDebouncedQuery] = useState('');
   const [selectedFood, setSelectedFood] = useState<Food | null>(null);
-  const [mealType, setMealType] = useState<MealType>('BREAKFAST');
-  const [grams, setGrams] = useState('100');
   const [gramEdits, setGramEdits] = useState<Record<string, string>>({});
-  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [searching, setSearching] = useState(false);
   const [error, setError] = useState('');
-  const [searchError, setSearchError] = useState(false);
+  const addForm = useForm<{ grams: string; mealType: MealType }>({ defaultValues: { grams: '100', mealType: 'BREAKFAST' } });
 
   useEffect(() => {
-    Promise.resolve().then(() => setToken(window.sessionStorage.getItem('nutrilog_access_token')));
+    Promise.resolve().then(() => {
+      const raw = window.sessionStorage.getItem('nutrilog_pending_food');
+      if (!raw) return;
+      window.sessionStorage.removeItem('nutrilog_pending_food');
+      try {
+        const parsed = pendingFoodSchema.safeParse(JSON.parse(raw));
+        if (parsed.success) { setSelectedFood(parsed.data as Food); setQuery(parsed.data.name); }
+      } catch { /* Ignore malformed product handoff data. */ }
+    });
   }, []);
 
+  const diaryQuery = useQuery({
+    queryKey: ['diary', date],
+    queryFn: async () => (await apiClient.get<Diary>('/diary', { params: { date } })).data,
+    enabled: ready && Boolean(token),
+  });
   useEffect(() => {
-    if (!token) return;
-    let active = true;
-    apiClient.get<Diary>('/diary', { params: { date }, headers: authHeader(token) })
-      .then(({ data }) => { if (active) setDiary(data); })
-      .catch(() => { if (active) setError(labels.failed); })
-      .finally(() => { if (active) setLoading(false); });
-    return () => { active = false; };
-  }, [date, labels.failed, token]);
-
-  useEffect(() => {
-    const term = query.trim();
-    if (term.length < 2) return;
-    let active = true;
-    const timer = window.setTimeout(() => {
-      setSearching(true);
-      setSearchError(false);
-      apiClient.get<FoodSearch>('/foods/search', { params: { q: term, page: 1, pageSize: 10 } })
-        .then(({ data }) => { if (active) setFoods(data.items); })
-        .catch(() => { if (active) setSearchError(true); })
-        .finally(() => { if (active) setSearching(false); });
-    }, 250);
-    return () => { active = false; window.clearTimeout(timer); };
+    const timer = window.setTimeout(() => setDebouncedQuery(query.trim()), 250);
+    return () => window.clearTimeout(timer);
   }, [query]);
-
+  const foodQuery = useQuery({
+    queryKey: ['foods', debouncedQuery, 'diary'],
+    queryFn: async () => (await apiClient.get<FoodSearch>('/foods/search', { params: { q: debouncedQuery, page: 1, pageSize: 10 } })).data,
+    enabled: debouncedQuery.length >= 2,
+  });
   async function refreshDiary(accessToken: string, selectedDate: string) {
     const { data } = await apiClient.get<Diary>('/diary', {
       params: { date: selectedDate }, headers: authHeader(accessToken),
     });
-    setDiary(data);
+    queryClient.setQueryData(['diary', selectedDate], data);
   }
 
-  async function addFood(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  function applyDiary(data: Diary) {
+    queryClient.setQueryData(['diary', date], data);
+  }
+  const diaryMutation = useMutation<Diary, Error, () => Promise<Diary>>({
+    mutationFn: (action) => action(),
+    onSuccess: (data) => { applyDiary(data); void queryClient.invalidateQueries({ queryKey: ['diary', date] }); },
+    onError: () => setError(labels.failed),
+  });
+
+  async function addFood(values: { grams: string; mealType: MealType }) {
     if (!token || !diary || !selectedFood) return;
+    const parsed = z.object({ grams: z.coerce.number().positive().max(50000), mealType: z.enum(mealTypes) }).safeParse(values);
+    if (!parsed.success) return;
     setSaving(true);
     setError('');
     let createdMealId: string | null = null;
     try {
-      let meal = diary.meals.find((entry) => entry.type === mealType);
+      let meal = diary.meals.find((entry) => entry.type === parsed.data.mealType);
       if (!meal) {
-        const { data } = await apiClient.post<Diary>('/diary/meals', { date, type: mealType }, { headers: authHeader(token) });
-        setDiary(data);
-        meal = data.meals.find((entry) => entry.type === mealType);
+        const { data } = await apiClient.post<Diary>('/diary/meals', { date, type: parsed.data.mealType }, { headers: authHeader(token) });
+        applyDiary(data);
+        meal = data.meals.find((entry) => entry.type === parsed.data.mealType);
         createdMealId = meal?.id ?? null;
       }
       if (!meal) throw new Error('Meal was not created');
-      await apiClient.post(`/diary/meals/${meal.id}/items`, {
-        foodId: selectedFood.id, grams: Number(grams),
-      }, { headers: authHeader(token) });
+      await diaryMutation.mutateAsync(async () => (await apiClient.post<Diary>(`/diary/meals/${meal.id}/items`, {
+        foodId: selectedFood.id, grams: parsed.data.grams,
+      }, { headers: authHeader(token) })).data);
       setSelectedFood(null);
       setQuery('');
       await refreshDiary(token, date);
+      await queryClient.invalidateQueries({ queryKey: ['diary', date] });
+      addForm.reset({ grams: '100', mealType: parsed.data.mealType });
     } catch {
       if (createdMealId) {
         await apiClient.delete(`/diary/meals/${createdMealId}`, { headers: authHeader(token) }).catch(() => undefined);
@@ -110,8 +120,7 @@ export function DiaryView({ labels }: { labels: Labels }) {
     if (!token) return;
     setSaving(true);
     try {
-      const { data } = await apiClient.post<Diary>('/diary/meals', { date, type }, { headers: authHeader(token) });
-      setDiary(data);
+      await diaryMutation.mutateAsync(async () => (await apiClient.post<Diary>('/diary/meals', { date, type }, { headers: authHeader(token) })).data);
     } catch {
       setError(labels.failed);
     } finally {
@@ -123,8 +132,7 @@ export function DiaryView({ labels }: { labels: Labels }) {
     if (!token) return;
     setSaving(true);
     try {
-      const { data } = await apiClient.patch<Diary>(`/diary/meals/${mealId}`, { type }, { headers: authHeader(token) });
-      setDiary(data);
+      await diaryMutation.mutateAsync(async () => (await apiClient.patch<Diary>(`/diary/meals/${mealId}`, { type }, { headers: authHeader(token) })).data);
     } catch {
       setError(labels.failed);
     } finally {
@@ -136,8 +144,7 @@ export function DiaryView({ labels }: { labels: Labels }) {
     if (!token) return;
     setSaving(true);
     try {
-      const { data } = await apiClient.delete<Diary>(`/diary/meals/${mealId}`, { headers: authHeader(token) });
-      setDiary(data);
+      await diaryMutation.mutateAsync(async () => (await apiClient.delete<Diary>(`/diary/meals/${mealId}`, { headers: authHeader(token) })).data);
     } catch {
       setError(labels.failed);
     } finally {
@@ -149,10 +156,9 @@ export function DiaryView({ labels }: { labels: Labels }) {
     if (!token) return;
     setSaving(true);
     try {
-      const { data } = await apiClient.patch<Diary>(`/diary/meals/${mealId}/items/${item.id}`, {
+      await diaryMutation.mutateAsync(async () => (await apiClient.patch<Diary>(`/diary/meals/${mealId}/items/${item.id}`, {
         grams: Number(gramEdits[item.id] ?? item.grams),
-      }, { headers: authHeader(token) });
-      setDiary(data);
+      }, { headers: authHeader(token) })).data);
       setGramEdits({ ...gramEdits, [item.id]: String(gramEdits[item.id] ?? item.grams) });
     } catch {
       setError(labels.failed);
@@ -165,8 +171,7 @@ export function DiaryView({ labels }: { labels: Labels }) {
     if (!token) return;
     setSaving(true);
     try {
-      const { data } = await apiClient.delete<Diary>(`/diary/meals/${mealId}/items/${itemId}`, { headers: authHeader(token) });
-      setDiary(data);
+      await diaryMutation.mutateAsync(async () => (await apiClient.delete<Diary>(`/diary/meals/${mealId}/items/${itemId}`, { headers: authHeader(token) })).data);
     } catch {
       setError(labels.failed);
     } finally {
@@ -174,9 +179,11 @@ export function DiaryView({ labels }: { labels: Labels }) {
     }
   }
 
-  if (token === undefined || (token && loading)) return <p>{labels.loading}</p>;
+  if (!ready || (token && diaryQuery.isPending)) return <p>{labels.loading}</p>;
   if (!token) return <section className={styles.content}><h1>{labels.title}</h1><Link href="/login">{labels.signIn}</Link></section>;
+  if (diaryQuery.isError) return <section className={styles.content}><p role="alert">{labels.failed}</p></section>;
 
+  const diary = diaryQuery.data;
   const totals = diary?.totals ?? { calories: 0, protein: 0, fat: 0, carbs: 0 };
   const goals = diary?.goals;
   const units: Array<[keyof typeof totals, string]> = [
@@ -187,13 +194,17 @@ export function DiaryView({ labels }: { labels: Labels }) {
     <section className={styles.content}>
       <header className={styles.header}>
         <h1>{labels.title}</h1>
-        <label>{labels.date}<input type="date" value={date} onChange={(event) => { setDiary(null); setLoading(true); setDate(event.target.value); }} /></label>
+        <div className={styles.dateNavigation}>
+          <button type="button" aria-label={labels.previousDay} onClick={() => changeDiaryDate(date, -1, setDate)}>‹</button>
+          <label>{labels.date}<input type="date" max={localDate()} value={date} onChange={(event) => setDate(event.target.value)} /></label>
+          <button type="button" aria-label={labels.nextDay} disabled={date >= localDate()} onClick={() => changeDiaryDate(date, 1, setDate)}>›</button>
+        </div>
       </header>
       <section className={styles.summary} aria-label={labels.totals}>
         <h2>{labels.totals}{goals ? ` | ${labels.goals}` : ''}</h2>
         <dl>{units.map(([key, label]) => (
           <div key={key}><dt>{label}</dt><dd>{totals[key]}{key === 'calories' ? ' kcal' : ' g'}
-            {goals?.[key] != null && <span> / {goals[key]}{key === 'calories' ? ' kcal' : ' g'}</span>}
+            {goals?.[key] != null && <><span> / {goals[key]}{key === 'calories' ? ' kcal' : ' g'}</span><progress value={Math.min(100, totals[key] / goals[key]! * 100)} max="100" /><small>{labels.remaining}: {Math.max(0, goals[key]! - totals[key])}{key === 'calories' ? ' kcal' : ' g'}</small></>}
           </dd></div>
         ))}</dl>
       </section>
@@ -203,23 +214,22 @@ export function DiaryView({ labels }: { labels: Labels }) {
           const value = event.target.value;
           setQuery(value);
           setSelectedFood(null);
-          if (value.trim().length < 2) { setFoods([]); setSearching(false); setSearchError(false); }
         }} maxLength={200} /></label>
-        {searching && <p role="status">{labels.loading}</p>}
-        {searchError && <p role="alert">{labels.foodSearchError}</p>}
-        {query.trim().length >= 2 && !searching && !searchError && foods.length === 0 && <p>{labels.noFoods}</p>}
-        {foods.length > 0 && (
-          <ul className={styles.foodResults}>{foods.map((food) => (
+        {foodQuery.isFetching && <p role="status">{labels.loading}</p>}
+        {foodQuery.isError && <p role="alert">{labels.foodSearchError}</p>}
+        {debouncedQuery.length >= 2 && !foodQuery.isFetching && !foodQuery.isError && foodQuery.data?.items.length === 0 && <p>{labels.noFoods}</p>}
+        {(foodQuery.data?.items.length ?? 0) > 0 && (
+          <ul className={styles.foodResults}>{foodQuery.data?.items.map((food) => (
             <li key={food.id}>
               <span>{food.name} <small>{food.calories} kcal / 100 g</small></span>
               <button type="button" aria-label={`${labels.select}: ${food.name}`} aria-pressed={selectedFood?.id === food.id} onClick={() => setSelectedFood(food)}>{labels.select}</button>
             </li>
           ))}</ul>
         )}
-        {selectedFood && <form className={styles.addForm} onSubmit={addFood}>
+        {selectedFood && <form className={styles.addForm} onSubmit={addForm.handleSubmit(addFood)}>
           <span>{selectedFood.name}</span>
-          <label>{labels.grams}<input type="number" min="0.01" max="50000" step="0.01" required value={grams} onChange={(event) => setGrams(event.target.value)} /></label>
-          <select aria-label={labels.addFood} value={mealType} onChange={(event) => setMealType(event.target.value as MealType)}>
+          <label>{labels.grams}<input type="number" min="0.01" max="50000" step="0.01" {...addForm.register('grams')} /></label>
+          <select aria-label={labels.addFood} {...addForm.register('mealType')}>
             {mealTypes.map((type) => <option value={type} key={type}>{labels[typeLabel[type]]}</option>)}
           </select>
           <button type="submit" disabled={saving}>{labels.add}</button>
@@ -264,4 +274,11 @@ function authHeader(token: string) {
 function localDate() {
   const now = new Date();
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+}
+
+function changeDiaryDate(date: string, offset: number, setDate: (value: string) => void) {
+  const value = new Date(`${date}T12:00:00`);
+  value.setDate(value.getDate() + offset);
+  const selected = `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, '0')}-${String(value.getDate()).padStart(2, '0')}`;
+  setDate(selected);
 }

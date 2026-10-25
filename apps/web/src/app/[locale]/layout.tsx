@@ -4,6 +4,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import '@unocss/reset/tailwind.css';
 import { Providers } from '../providers';
+import { SiteHeader } from '../../shared/ui/site-header';
 import { routing } from '../../../i18n/routing';
 import '../globals.scss';
 
@@ -26,6 +27,7 @@ export async function generateMetadata({
   }
 
   setRequestLocale(locale);
+
   const t = await getTranslations({ locale, namespace: 'metadata' });
 
   return { title: t('title'), description: t('description') };
@@ -39,12 +41,16 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
   }
 
   setRequestLocale(locale);
+  const t = await getTranslations({ locale, namespace: 'navigation' });
 
   return (
     <html lang={locale}>
       <body>
         <NextIntlClientProvider>
-          <Providers>{children}</Providers>
+          <Providers>
+            <SiteHeader labels={{ diary: t('diary'), profile: t('profile'), catalog: t('catalog'), signIn: t('signIn'), register: t('register'), signOut: t('signOut') }} />
+            {children}
+          </Providers>
         </NextIntlClientProvider>
       </body>
     </html>

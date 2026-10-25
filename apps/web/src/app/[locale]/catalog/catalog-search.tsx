@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { useRouter } from '../../../../i18n/navigation';
 import { apiClient } from '../../../shared/api/client';
 import styles from './catalog.module.scss';
 
@@ -20,56 +22,31 @@ type FoodSearch = {
   items: Food[];
   pagination: { page: number; pageSize: number; total: number; totalPages: number };
 };
-type SearchResult = { query: string; response: FoodSearch };
 type Labels = Record<string, string>;
 
 export function CatalogSearch({ labels }: { labels: Labels }) {
   const [query, setQuery] = useState('');
-  const [result, setResult] = useState<SearchResult | null>(null);
-  const [selected, setSelected] = useState<Food | null>(null);
+  const [debouncedQuery, setDebouncedQuery] = useState('');
   const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
-    const normalized = query.trim();
-    if (normalized.length < 2) return;
+    const timer = window.setTimeout(() => setDebouncedQuery(query.trim()), 250);
+    return () => window.clearTimeout(timer);
+  }, [query]);
 
-    const controller = new AbortController();
-    const timer = window.setTimeout(() => {
-      setLoading(true);
-      setError(false);
-      setResult(null);
-      apiClient.get<FoodSearch>('/foods/search', {
-        params: { q: normalized, page, pageSize: 12 },
-        signal: controller.signal,
-      }).then(({ data }) => setResult({ query: normalized, response: data }))
-        .catch(() => {
-          if (controller.signal.aborted) return;
-          setError(true);
-        })
-        .finally(() => {
-          if (!controller.signal.aborted) setLoading(false);
-        });
-    }, 250);
-
-    return () => {
-      window.clearTimeout(timer);
-      controller.abort();
-    };
-  }, [query, page]);
+  const search = useQuery({
+    queryKey: ['foods', debouncedQuery, page],
+    queryFn: async () => (await apiClient.get<FoodSearch>('/foods/search', { params: { q: debouncedQuery, page, pageSize: 12 } })).data,
+    enabled: debouncedQuery.length >= 2,
+  });
 
   function changeQuery(value: string) {
     setQuery(value);
     setPage(1);
-    setSelected(null);
-    if (value.trim().length < 2) {
-      setLoading(false);
-      setError(false);
-    }
   }
 
-  const visibleResult = result?.query === query.trim() ? result.response : null;
+  const visibleResult = debouncedQuery === query.trim() ? search.data : null;
 
   return (
     <section className={styles.content}>
@@ -85,9 +62,9 @@ export function CatalogSearch({ labels }: { labels: Labels }) {
           maxLength={200}
         />
       </label>
-      {loading && <p role="status">{labels.loading}</p>}
-      {error && <p role="alert">{labels.error}</p>}
-      {!loading && !error && query.trim().length >= 2 && visibleResult?.items.length === 0 && <p>{labels.noResults}</p>}
+      {search.isFetching && <p role="status">{labels.loading}</p>}
+      {search.isError && <p role="alert">{labels.error}</p>}
+      {!search.isFetching && !search.isError && query.trim().length >= 2 && visibleResult?.items.length === 0 && <p>{labels.noResults}</p>}
       {visibleResult && visibleResult.items.length > 0 && (
         <>
           <ul className={styles.list}>
@@ -98,8 +75,11 @@ export function CatalogSearch({ labels }: { labels: Labels }) {
                     <h2>{food.name}</h2>
                     {food.category && <p>{food.category}</p>}
                   </div>
-                  <button type="button" aria-pressed={selected?.id === food.id} onClick={() => setSelected(food)}>
-                    {labels.select}
+                  <button type="button" onClick={() => {
+                    window.sessionStorage.setItem('nutrilog_pending_food', JSON.stringify(food));
+                    router.push('/diary');
+                  }}>
+                    {labels.addToDiary}
                   </button>
                 </div>
                 <dl className={styles.nutrition}>
@@ -120,12 +100,6 @@ export function CatalogSearch({ labels }: { labels: Labels }) {
             </nav>
           )}
         </>
-      )}
-      {selected && (
-        <aside className={styles.selected} aria-live="polite">
-          <h2>{labels.selected}</h2>
-          <p>{selected.name}</p>
-        </aside>
       )}
     </section>
   );
