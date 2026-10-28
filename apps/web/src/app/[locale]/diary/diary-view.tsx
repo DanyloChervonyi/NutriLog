@@ -196,17 +196,19 @@ export function DiaryView({ labels }: { labels: Labels }) {
         <h1>{labels.title}</h1>
         <div className={styles.dateNavigation}>
           <button type="button" aria-label={labels.previousDay} onClick={() => changeDiaryDate(date, -1, setDate)}>‹</button>
-          <label>{labels.date}<input type="date" max={localDate()} value={date} onChange={(event) => setDate(event.target.value)} /></label>
+          <label>{labels.date}<input type="date" required max={localDate()} value={date} onChange={(event) => { if (event.target.value) setDate(event.target.value); }} /></label>
           <button type="button" aria-label={labels.nextDay} disabled={date >= localDate()} onClick={() => changeDiaryDate(date, 1, setDate)}>›</button>
         </div>
       </header>
       <section className={styles.summary} aria-label={labels.totals}>
         <h2>{labels.totals}{goals ? ` | ${labels.goals}` : ''}</h2>
-        <dl>{units.map(([key, label]) => (
-          <div key={key}><dt>{label}</dt><dd>{totals[key]}{key === 'calories' ? ' kcal' : ' g'}
-            {goals?.[key] != null && <><span> / {goals[key]}{key === 'calories' ? ' kcal' : ' g'}</span><progress value={Math.min(100, totals[key] / goals[key]! * 100)} max="100" /><small>{labels.remaining}: {Math.max(0, goals[key]! - totals[key])}{key === 'calories' ? ' kcal' : ' g'}</small></>}
-          </dd></div>
-        ))}</dl>
+        <dl>{units.map(([key, label]) => {
+          const goal = goals?.[key] ?? null;
+          const progress = goal !== null && goal > 0 ? Math.min(100, (totals[key] / goal) * 100) : 0;
+          return <div key={key}><dt>{label}</dt><dd>{totals[key]}{key === 'calories' ? ' kcal' : ' g'}
+            {goal !== null && <><span> / {goal}{key === 'calories' ? ' kcal' : ' g'}</span><progress aria-label={`${label}: ${Math.round(progress)}%`} value={progress} max="100" /><small>{labels.remaining}: {Math.max(0, goal - totals[key])}{key === 'calories' ? ' kcal' : ' g'}</small></>}
+          </dd></div>;
+        })}</dl>
       </section>
       <section className={styles.addFood}>
         <h2>{labels.addFood}</h2>
