@@ -67,7 +67,7 @@ The canvas is near-black with a subtle green-blue cast. Content panels use a dis
 
 ## Typography
 
-Use one system sans stack for interface text across all locales. Headings are compact and semibold; the public landing may use a larger balanced headline. Data uses aligned numerals (`font-variant-numeric: tabular-nums`). Labels remain sentence case. Do not use display or monospace type as decoration.
+Use Noto Sans for a consistent, readable interface across Latin and Cyrillic locales, with system sans-serif fallbacks. Headings are compact and semibold; the public landing uses a clear, restrained headline. Data uses aligned numerals (`font-variant-numeric: tabular-nums`). Labels remain sentence case. Do not use display or monospace type as decoration.
 
 ## Layout
 
@@ -98,6 +98,8 @@ The top navigation remains present on all routes and wraps into a compact mobile
 ### Forms and overlays
 
 Use native inputs and selects with themed browser controls, visible labels, persistent focus rings, and clear validation states. Search and date controls remain keyboard-operable. No new overlay behavior is introduced by the visual redesign.
+
+The locale control is a searchable dropdown: names stay in their native writing systems, the search input supports arrow-key navigation and Enter to select, and Escape closes the list. Ukrainian is the first and default locale.
 
 ### Iconography
 

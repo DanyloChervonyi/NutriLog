@@ -4,7 +4,7 @@
 
 - Audience: people who track their nutrition.
 - Primary jobs: set personal targets, find foods, record portions by meal, review a day, and open diary history.
-- Active locales: Russian, Ukrainian, and English.
+- Active locales: Ukrainian (first and default), Russian, and English. Language names use their native writing systems; the header selector supports keyboard search and selection.
 - Timezone/calendar policy: diary date is selected in the browser's local date; future dates are unavailable.
 - Accessibility target: semantic controls, visible keyboard focus, and readable text at mobile widths.
 
