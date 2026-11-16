@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { useRouter } from '../../../../i18n/navigation';
 import { apiClient } from '../../../shared/api/client';
 import styles from './catalog.module.scss';
@@ -25,6 +26,7 @@ type FoodSearch = {
 type Labels = Record<string, string>;
 
 export function CatalogSearch({ labels }: { labels: Labels }) {
+  const [resultsRef] = useAutoAnimate<HTMLUListElement>({ duration: 180, easing: 'ease-out' });
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [page, setPage] = useState(1);
@@ -67,7 +69,7 @@ export function CatalogSearch({ labels }: { labels: Labels }) {
       {!search.isFetching && !search.isError && query.trim().length >= 2 && visibleResult?.items.length === 0 && <p>{labels.noResults}</p>}
       {visibleResult && visibleResult.items.length > 0 && (
         <>
-          <ul className={styles.list}>
+          <ul ref={resultsRef} className={styles.list}>
             {visibleResult.items.map((food) => (
               <li className={styles.item} key={food.id}>
                 <div className={styles.foodHeading}>

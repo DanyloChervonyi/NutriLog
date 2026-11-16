@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { Link } from '../../../../i18n/navigation';
@@ -23,6 +24,7 @@ const profileSchema = z.object({
 });
 
 export function ProfileForm({ labels }: { labels: Labels }) {
+  const [formRef] = useAutoAnimate<HTMLFormElement>({ duration: 180, easing: 'ease-out' });
   const { accessToken, ready } = useAuth();
   const queryClient = useQueryClient();
   const profileQuery = useQuery({ queryKey: ['profile'], queryFn: async () => (await apiClient.get<Profile | null>('/profile')).data, enabled: ready && Boolean(accessToken) });
@@ -56,7 +58,7 @@ export function ProfileForm({ labels }: { labels: Labels }) {
 
   return <section className={styles.form}>
     <h1>{labels.title}</h1>
-    <form className={styles.form} onSubmit={form.handleSubmit(submit)}>
+    <form ref={formRef} className={styles.form} onSubmit={form.handleSubmit(submit)}>
       {field('gender', labels.gender, [['FEMALE', labels.female], ['MALE', labels.male]])}
       <label className={styles.field}>{labels.age}<input type="number" min="13" max="120" {...form.register('age')} /></label>
       <label className={styles.field}>{labels.height}<input type="number" min="100" max="250" step="0.01" {...form.register('heightCm')} /></label>

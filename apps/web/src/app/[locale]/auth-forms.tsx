@@ -3,6 +3,7 @@
 import { useLocale, useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
+import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { authRequest, type AuthResponse } from '../../shared/api/auth';
@@ -17,6 +18,7 @@ type AuthFormsProps = Readonly<{
 }>;
 
 export function AuthForms({ mode, title, token = '' }: AuthFormsProps) {
+  const [formRef] = useAutoAnimate<HTMLFormElement>({ duration: 180, easing: 'ease-out' });
   const t = useTranslations('auth');
   const locale = useLocale();
   const router = useRouter();
@@ -83,7 +85,7 @@ export function AuthForms({ mode, title, token = '' }: AuthFormsProps) {
   const googleLoginUrl = `${process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:4000/api/v1'}/auth/google`;
 
   return (
-    <form className={styles.form} onSubmit={form.handleSubmit(submit)}>
+    <form ref={formRef} className={styles.form} onSubmit={form.handleSubmit(submit)}>
       <h1>{title}</h1>
       {(mode === 'login' || mode === 'register') ? (
         <>

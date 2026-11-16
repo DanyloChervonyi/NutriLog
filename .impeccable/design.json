@@ -1,0 +1,26 @@
+{
+  "version": 1,
+  "source": "apps/web/src/app/globals.scss",
+  "documentation": "DESIGN.md",
+  "tokens": {
+    "canvas": "--canvas",
+    "ambient": "--ambient",
+    "surface": "--surface",
+    "surfaceRaised": "--surface-raised",
+    "surfaceHover": "--surface-hover",
+    "surfaceDanger": "--surface-danger",
+    "border": "--border",
+    "borderStrong": "--border-strong",
+    "borderSubtle": "--border-subtle",
+    "text": "--ink",
+    "muted": "--muted",
+    "accent": "--accent",
+    "accentStrong": "--accent-strong",
+    "accentSoft": "--accent-soft",
+    "onAccent": "--on-accent",
+    "danger": "--danger",
+    "dangerStrong": "--danger-strong",
+    "warning": "--warning",
+    "info": "--info"
+  }
+}

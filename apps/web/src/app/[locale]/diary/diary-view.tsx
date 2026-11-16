@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { Link } from '../../../../i18n/navigation';
@@ -29,6 +30,8 @@ const typeLabel: Record<MealType, string> = {
 const pendingFoodSchema = z.object({ id: z.string(), name: z.string(), brand: z.string().nullable().optional(), calories: z.number(), protein: z.number(), fat: z.number(), carbs: z.number() });
 
 export function DiaryView({ labels }: { labels: Labels }) {
+  const [addFoodRef] = useAutoAnimate<HTMLElement>({ duration: 180, easing: 'ease-out' });
+  const [foodResultsRef] = useAutoAnimate<HTMLUListElement>({ duration: 180, easing: 'ease-out' });
   const { accessToken: token, ready } = useAuth();
   const queryClient = useQueryClient();
   const [date, setDate] = useState(localDate());
@@ -210,7 +213,7 @@ export function DiaryView({ labels }: { labels: Labels }) {
           </dd></div>;
         })}</dl>
       </section>
-      <section className={styles.addFood}>
+      <section ref={addFoodRef} className={styles.addFood}>
         <h2>{labels.addFood}</h2>
         <label className={styles.search}>{labels.search}<input placeholder={labels.searchHint} value={query} onChange={(event) => {
           const value = event.target.value;
@@ -221,7 +224,7 @@ export function DiaryView({ labels }: { labels: Labels }) {
         {foodQuery.isError && <p role="alert">{labels.foodSearchError}</p>}
         {debouncedQuery.length >= 2 && !foodQuery.isFetching && !foodQuery.isError && foodQuery.data?.items.length === 0 && <p>{labels.noFoods}</p>}
         {(foodQuery.data?.items.length ?? 0) > 0 && (
-          <ul className={styles.foodResults}>{foodQuery.data?.items.map((food) => (
+          <ul ref={foodResultsRef} className={styles.foodResults}>{foodQuery.data?.items.map((food) => (
             <li key={food.id}>
               <span>{food.name} <small>{food.calories} kcal / 100 g</small></span>
               <button type="button" aria-label={`${labels.select}: ${food.name}`} aria-pressed={selectedFood?.id === food.id} onClick={() => setSelectedFood(food)}>{labels.select}</button>
