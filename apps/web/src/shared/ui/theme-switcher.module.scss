@@ -1,0 +1,106 @@
+.switcher {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, 2.5rem);
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  isolation: isolate;
+
+  &::before {
+    position: absolute;
+    z-index: -1;
+    top: 3px;
+    left: 3px;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: calc(var(--radius-control) - 0.2rem);
+    background: var(--accent-soft);
+    content: '';
+    transition: transform 180ms ease;
+  }
+
+  &[data-preference='light']::before {
+    transform: translateX(calc(2.5rem + 2px));
+  }
+
+  &[data-preference='dark']::before {
+    transform: translateX(calc((2.5rem + 2px) * 2));
+  }
+}
+
+.option {
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: calc(var(--radius-control) - 0.2rem);
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition: color 160ms ease, background-color 160ms ease;
+
+  &[aria-pressed='true'] {
+    color: var(--accent-strong);
+  }
+
+  &:hover:not([aria-pressed='true']) {
+    background: var(--accent-soft);
+    color: var(--accent-strong);
+  }
+
+  &:focus-visible {
+    z-index: 1;
+    outline: none;
+    box-shadow: inset 0 0 0 2px var(--accent-strong);
+  }
+
+  svg {
+    width: 2rem;
+    height: 2rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 2.4;
+  }
+}
+
+@media (max-width: 680px) {
+  .switcher {
+    grid-template-columns: repeat(3, 2.25rem);
+
+    &::before {
+      width: 2.25rem;
+      height: 2.25rem;
+    }
+
+    &[data-preference='light']::before {
+      transform: translateX(calc(2.25rem + 2px));
+    }
+
+    &[data-preference='dark']::before {
+      transform: translateX(calc((2.25rem + 2px) * 2));
+    }
+  }
+
+  .option {
+    width: 2.25rem;
+    height: 2.25rem;
+
+    svg {
+      width: 1.75rem;
+      height: 1.75rem;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .switcher::before {
+    transition: none;
+  }
+}

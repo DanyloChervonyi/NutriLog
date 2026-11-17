@@ -22,7 +22,7 @@
 - Token ownership model: runtime CSS is canonical; `DESIGN.md` mirrors its semantic values.
 - Runtime design-system/token source: `apps/web/src/app/globals.scss`.
 - Mapping/adapters: semantic custom properties consumed by CSS Modules and shared components.
-- Supported themes: dark blue-green.
+- Supported themes: system (default), light, and dark. An icon-only three-position slider exposes the modes with accessible names. The existing blue-green accent family is retained across themes, with accessible contrast-adjusted values.
 - Design-context owner/review policy: preserve the product workflows and shared token mapping across route changes.
 
 ## Canonical UI Map

@@ -36,6 +36,12 @@
     "uk": "Українська",
     "en": "English"
   },
+  "theme": {
+    "label": "Цветовая тема",
+    "system": "Система",
+    "light": "Светлая",
+    "dark": "Тёмная"
+  },
   "auth": {
     "loginTitle": "Вход в NutriLog",
     "forgotTitle": "Сброс пароля",

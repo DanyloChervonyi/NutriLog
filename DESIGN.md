@@ -1,8 +1,27 @@
 ---
 version: alpha
 name: NutriLog
-description: A focused nutrition journal with cool, dark surfaces and blue-shifted green signals.
+description: A focused nutrition journal with system-aware light and dark surfaces and blue-shifted green signals.
 colors:
+  background: "#F3F8F6"
+  ambient: "#D8EEE7"
+  surface: "#FFFFFF"
+  raised: "#F9FCFB"
+  surface-danger: "#FFF0EF"
+  border: "#D0DFDA"
+  border-strong: "#9BB9B1"
+  border-subtle: "#E3ECE9"
+  text: "#17312D"
+  muted: "#526B66"
+  primary: "#16836F"
+  primary-strong: "#126B5A"
+  primary-soft: "#DCEFE9"
+  on-primary: "#FFFFFF"
+  danger: "#B8474B"
+  danger-strong: "#8D3036"
+  warning: "#805711"
+  info: "#246D7B"
+darkColors:
   background: "#071514"
   ambient: "#184E46"
   surface: "#0D201F"
@@ -23,7 +42,7 @@ colors:
   info: "#8EC5D0"
 typography:
   sans:
-    fontFamily: "ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+    fontFamily: "Noto Sans, ui-sans-serif, system-ui, sans-serif"
   mono:
     fontFamily: "ui-monospace, SFMono-Regular, Consolas, monospace"
 rounded:
@@ -47,7 +66,7 @@ components:
 
 ### Creative North Star
 
-NutriLog is a personal nutrition field console: a calm, dark instrument surface that keeps the daily food record legible at a glance. The food lookup and nutrition-per-100-g clarity of TablicaKalorijnosti.ru inform the product structure. The supplied sports dashboards inform contrast and color energy, without importing betting or match-day imagery.
+NutriLog is a calm nutrition journal with a bright, low-glare default and an optional deep teal dark theme. The food lookup and nutrition-per-100-g clarity of TablicaKalorijnosti.ru inform the product structure. The supplied sports dashboards inform the blue-green accent color, without importing betting or match-day imagery.
 
 ### Product context and register
 
@@ -56,14 +75,14 @@ NutriLog is a personal nutrition field console: a calm, dark instrument surface 
 - **Locale(s) and language policy:** `ru`, `uk`, and `en`; interface labels come from locale JSON messages.
 - **Usage scene:** Frequent short check-ins on desktop or mobile, often while adding a meal; dense numeric content must remain scannable.
 - **Register:** Product UI across diary, catalog, profile, and authentication routes.
-- **Memorable signature:** Daily nutrition values read as a compact, aligned signal board, with blue-green progress marks against deep teal-black surfaces.
+- **Memorable signature:** Daily nutrition values read as a compact, aligned summary, with blue-green progress marks on soft, neutral surfaces.
 - **Restraint:** Food names, amounts, and macro values remain primary. Accent color is reserved for actions, selected states, and progress.
 - **Anti-references:** Betting controls, scores, odds, neon-green glow, and decorative sports imagery; light generic dashboard cards; low-contrast gray text.
 - **Token ownership/runtime mapping:** Runtime CSS variables in `apps/web/src/app/globals.scss` own the rendered values. This file mirrors those semantic tokens. `apps/web/src/app/globals.scss` → CSS Modules → shared and route components; keep this mapping aligned when tokens change.
 
 ## Colors
 
-The canvas is near-black with a subtle green-blue cast. Content panels use a distinct deep teal layer; raised panels are lighter by tone, not by a broad shadow. Primary green shifts toward turquoise (`primary`) for clear progress and selected controls. The supplied sports references contribute cool dark surfaces and contrast, while the food reference informs quick food lookup and visible nutrition values. Foreground is soft white; secondary text is pale teal and must remain readable. Danger, warning, and information each have a separate semantic color. Controls, selection, focus, and progress use semantic tokens; route styles do not carry independent hex values.
+The default system-aware light canvas is soft and neutral, with white panels and clear borders. The optional dark theme uses the existing near-black canvas and deep teal surfaces. Both themes retain the same blue-shifted green accent family, with contrast-adjusted token values for readable text and controls. Danger, warning, and information each have a separate semantic color. Controls, selection, focus, and progress use semantic tokens; route styles do not carry independent hex values.
 
 ## Typography
 
@@ -99,7 +118,9 @@ The top navigation remains present on all routes and wraps into a compact mobile
 
 Use native inputs and selects with themed browser controls, visible labels, persistent focus rings, and clear validation states. Search and date controls remain keyboard-operable. No new overlay behavior is introduced by the visual redesign.
 
-The locale control is a searchable dropdown: names stay in their native writing systems, the search input supports arrow-key navigation and Enter to select, and Escape closes the list. Ukrainian is the first and default locale.
+The locale control is a searchable dropdown: names stay in their native writing systems, the search input supports arrow-key navigation and Enter to select, and Escape closes the list. Ukrainian is the first and default locale. The adjacent theme control offers system, light, and dark preferences; system is the default.
+
+The theme control is an icon-only three-position slider for system, light, and dark. Each icon keeps a localized accessible name.
 
 ### Iconography
 

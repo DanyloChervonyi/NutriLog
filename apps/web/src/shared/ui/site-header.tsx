@@ -6,6 +6,7 @@ import { Link, useRouter } from '../../../i18n/navigation';
 import { apiClient } from '../api/client';
 import { useAuth } from '../auth/auth-context';
 import { LocaleSwitcher } from './locale-switcher';
+import { ThemeSwitcher } from './theme-switcher';
 import styles from './site-header.module.scss';
 
 type Labels = Readonly<{ diary: string; profile: string; catalog: string; signIn: string; register: string; signOut: string }>;
@@ -28,6 +29,7 @@ export function SiteHeader({ labels }: { labels: Labels }) {
       {accessToken && <Link href="/profile">{labels.profile}</Link>}
     </nav>
     <div ref={actionsRef} className={styles.actions}>
+      <ThemeSwitcher />
       <LocaleSwitcher />
       {ready && (accessToken
         ? <button type="button" disabled={signOut.isPending} onClick={() => signOut.mutate()}>{labels.signOut}</button>

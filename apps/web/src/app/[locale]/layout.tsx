@@ -15,6 +15,8 @@ const notoSans = Noto_Sans({
   variable: '--font-noto-sans',
 });
 
+const themeBootstrap = `try{const theme=localStorage.getItem('nutrilog-theme');if(theme==='system'||theme==='light'||theme==='dark'){document.documentElement.dataset.theme=theme;}}catch{}`;
+
 type LocaleLayoutProps = Readonly<{
   children: React.ReactNode;
   params: Promise<{ locale: string }>;
@@ -51,7 +53,10 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
   const t = await getTranslations({ locale, namespace: 'navigation' });
 
   return (
-    <html lang={locale}>
+    <html lang={locale} data-theme="system" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeBootstrap }} />
+      </head>
       <body className={notoSans.variable}>
         <NextIntlClientProvider>
           <Providers>
