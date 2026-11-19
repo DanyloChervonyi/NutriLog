@@ -1,5 +1,5 @@
 .page {
-  min-height: 100svh;
+  min-height: calc(100svh - var(--header-height) - var(--footer-height));
   padding: 2.25rem 1.25rem 4rem;
 }
 

@@ -4,7 +4,7 @@
 
 - Audience: people who track their nutrition.
 - Primary jobs: set personal targets, find foods, record portions by meal, review a day, and open diary history.
-- Active locales: Ukrainian (first and default), Russian, and English. Language names use their native writing systems; the header selector supports keyboard search and selection.
+- Active locales: Ukrainian, Russian, and English. On first visit, the browser's preferred supported language is selected; Ukrainian is the fallback. Manual selection is retained. Names use their native writing systems; the footer selector supports keyboard search and selection.
 - Timezone/calendar policy: diary date is selected in the browser's local date; future dates are unavailable.
 - Accessibility target: semantic controls, visible keyboard focus, and readable text at mobile widths.
 
@@ -22,7 +22,7 @@
 - Token ownership model: runtime CSS is canonical; `DESIGN.md` mirrors its semantic values.
 - Runtime design-system/token source: `apps/web/src/app/globals.scss`.
 - Mapping/adapters: semantic custom properties consumed by CSS Modules and shared components.
-- Supported themes: system (default), light, and dark. An icon-only three-position slider exposes the modes with accessible names. The existing blue-green accent family is retained across themes, with accessible contrast-adjusted values.
+- Supported themes: system (default), light, and dark. An icon-only dropdown exposes the modes with accessible names. The locale and theme icons share a size and color across themes; the dark blue-green palette uses brighter values, and a subtle gradient appears in light mode.
 - Design-context owner/review policy: preserve the product workflows and shared token mapping across route changes.
 
 ## Canonical UI Map
@@ -66,6 +66,7 @@
 
 - The locale home route is a public landing page with registration, sign-in, and catalog actions. After the client session is restored, an authenticated visitor is redirected to the diary.
 - The NutriLog brand link returns to the locale home route.
+- The header and footer stay fixed to the viewport at the same reduced height while the main content scrolls. The footer contains the icon-only locale and theme controls on every localized route; mobile navigation opens from a compact menu button.
 - Top navigation links to diary and catalog; profile is shown for an authenticated user. Auth actions depend on session state.
 - Locale switcher exposes Russian, Ukrainian, and English.
 - Diary summary and meals use multiple columns on desktop and collapse to one column on mobile.

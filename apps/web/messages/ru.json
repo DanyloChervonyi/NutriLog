@@ -42,6 +42,10 @@
     "light": "Светлая",
     "dark": "Тёмная"
   },
+  "footer": {
+    "label": "Настройки сайта",
+    "description": "Дневник питания и личные цели"
+  },
   "auth": {
     "loginTitle": "Вход в NutriLog",
     "forgotTitle": "Сброс пароля",
@@ -149,6 +153,9 @@
     "remaining": "Осталось до цели"
   },
   "navigation": {
+    "navLabel": "Основная навигация",
+    "openMenu": "Открыть меню",
+    "closeMenu": "Закрыть меню",
     "diary": "Дневник",
     "profile": "Профиль",
     "catalog": "Продукты",

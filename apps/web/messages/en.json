@@ -42,6 +42,10 @@
     "light": "Light",
     "dark": "Dark"
   },
+  "footer": {
+    "label": "Site preferences",
+    "description": "Your food journal and personal goals"
+  },
   "auth": {
     "loginTitle": "Sign in to NutriLog",
     "forgotTitle": "Reset password",
@@ -149,6 +153,9 @@
     "remaining": "Remaining to goal"
   },
   "navigation": {
+    "navLabel": "Main navigation",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
     "diary": "Diary",
     "profile": "Profile",
     "catalog": "Foods",

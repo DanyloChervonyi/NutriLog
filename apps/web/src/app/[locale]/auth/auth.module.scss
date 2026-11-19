@@ -1,6 +1,6 @@
 .page {
   display: grid;
-  min-height: calc(100svh - 4.5rem);
+  min-height: calc(100svh - var(--header-height) - var(--footer-height));
   place-items: center;
   padding: 2.5rem 1rem 4rem;
 }
@@ -153,7 +153,7 @@
 
 @media (max-width: 480px) {
   .page {
-    min-height: calc(100svh - 7.5rem);
+    min-height: calc(100svh - var(--header-height) - var(--footer-height));
     padding: 1.5rem 1rem 3rem;
   }
 }

@@ -42,6 +42,10 @@
     "light": "Світла",
     "dark": "Темна"
   },
+  "footer": {
+    "label": "Налаштування сайту",
+    "description": "Щоденник харчування та особисті цілі"
+  },
   "auth": {
     "loginTitle": "Вхід до NutriLog",
     "forgotTitle": "Скидання пароля",
@@ -149,6 +153,9 @@
     "remaining": "Залишилося до цілі"
   },
   "navigation": {
+    "navLabel": "Основна навігація",
+    "openMenu": "Відкрити меню",
+    "closeMenu": "Закрити меню",
     "diary": "Щоденник",
     "profile": "Профіль",
     "catalog": "Продукти",

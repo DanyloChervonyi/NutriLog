@@ -99,8 +99,11 @@ export function LocaleSwitcher() {
           setIsOpen((current) => !current);
         }}
       >
-        <span>{localeNames[locale]}</span>
-        <span className={styles.chevron} aria-hidden="true" />
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <circle cx="12" cy="12" r="9" />
+          <path d="M3 12h18M12 3c2.4 2.5 3.5 5.5 3.5 9s-1.1 6.5-3.5 9c-2.4-2.5-3.5-5.5-3.5-9S9.6 5.5 12 3Z" />
+          <path d="M5.2 6.5h13.6M5.2 17.5h13.6" />
+        </svg>
       </button>
 
       {isOpen && (

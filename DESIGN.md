@@ -5,6 +5,7 @@ description: A focused nutrition journal with system-aware light and dark surfac
 colors:
   background: "#F3F8F6"
   ambient: "#D8EEE7"
+  bar-surface: "#F9FCFB"
   surface: "#FFFFFF"
   raised: "#F9FCFB"
   surface-danger: "#FFF0EF"
@@ -16,30 +17,34 @@ colors:
   primary: "#16836F"
   primary-strong: "#126B5A"
   primary-soft: "#DCEFE9"
+  icon: "#16836F"
   on-primary: "#FFFFFF"
   danger: "#B8474B"
   danger-strong: "#8D3036"
   warning: "#805711"
   info: "#246D7B"
+  bar-surface: "#102522"
+  icon: "#9AE8D7"
 darkColors:
-  background: "#071514"
-  ambient: "#184E46"
-  surface: "#0D201F"
-  raised: "#132B2B"
-  surface-danger: "#3C2022"
-  border: "#294443"
-  border-strong: "#47716A"
-  border-subtle: "#1A302E"
-  text: "#EEF7F4"
-  muted: "#A8BFBB"
-  primary: "#39BFA7"
-  primary-strong: "#8BE2CE"
-  primary-soft: "#143B38"
+  background: "#0B1C1A"
+  ambient: "#215B52"
+  surface: "#102522"
+  raised: "#183431"
+  surface-danger: "#492A2B"
+  border: "#35534F"
+  border-strong: "#5D887F"
+  border-subtle: "#253D39"
+  text: "#F3FBF8"
+  muted: "#B5CBC6"
+  primary: "#49CDB2"
+  primary-strong: "#9AE8D7"
+  primary-soft: "#1C4842"
+  icon: "#16836F"
   on-primary: "#06211C"
-  danger: "#F08483"
-  danger-strong: "#FFB6B3"
-  warning: "#E9C47B"
-  info: "#8EC5D0"
+  danger: "#FF9995"
+  danger-strong: "#FFC0BC"
+  warning: "#F3D18C"
+  info: "#A0D7DF"
 typography:
   sans:
     fontFamily: "Noto Sans, ui-sans-serif, system-ui, sans-serif"
@@ -116,11 +121,11 @@ The top navigation remains present on all routes and wraps into a compact mobile
 
 ### Forms and overlays
 
-Use native inputs and selects with themed browser controls, visible labels, persistent focus rings, and clear validation states. Search and date controls remain keyboard-operable. No new overlay behavior is introduced by the visual redesign.
+Use native inputs and selects with themed browser controls, visible labels, persistent focus rings, and clear validation states. Search and date controls remain keyboard-operable. Borderless locale and theme menus open above the fixed footer; mobile navigation opens below the fixed header.
 
-The locale control is a searchable dropdown: names stay in their native writing systems, the search input supports arrow-key navigation and Enter to select, and Escape closes the list. Ukrainian is the first and default locale. The adjacent theme control offers system, light, and dark preferences; system is the default.
+The footer contains the searchable locale dropdown and theme control. Language names stay in their native writing systems; the globe and theme icons have localized accessible names. The locale search supports arrow-key navigation and Enter to select, and Escape closes the list. On first visit, a supported browser language is selected; Ukrainian is the fallback.
 
-The theme control is an icon-only three-position slider for system, light, and dark. Each icon keeps a localized accessible name.
+The theme control is a borderless icon dropdown for system, light, and dark. Its trigger shows the active mode icon, and the menu lists the three existing icons with localized accessible names. Locale and theme icons use the same size and color in both themes. The light theme has a subtle teal gradient; dark mode uses brighter blue-green surfaces while retaining the same palette.
 
 ### Iconography
 

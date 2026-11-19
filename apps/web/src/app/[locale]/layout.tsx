@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation';
 import { Noto_Sans } from 'next/font/google';
 import '@unocss/reset/tailwind.css';
 import { Providers } from '../providers';
+import { SiteFooter } from '../../shared/ui/site-footer';
 import { SiteHeader } from '../../shared/ui/site-header';
 import { routing } from '../../../i18n/routing';
 import '../globals.scss';
@@ -60,8 +61,13 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
       <body className={notoSans.variable}>
         <NextIntlClientProvider>
           <Providers>
-            <SiteHeader labels={{ diary: t('diary'), profile: t('profile'), catalog: t('catalog'), signIn: t('signIn'), register: t('register'), signOut: t('signOut') }} />
+            <SiteHeader labels={{
+              diary: t('diary'), profile: t('profile'), catalog: t('catalog'), signIn: t('signIn'),
+              register: t('register'), signOut: t('signOut'), navLabel: t('navLabel'),
+              openMenu: t('openMenu'), closeMenu: t('closeMenu'),
+            }} />
             {children}
+            <SiteFooter />
           </Providers>
         </NextIntlClientProvider>
       </body>

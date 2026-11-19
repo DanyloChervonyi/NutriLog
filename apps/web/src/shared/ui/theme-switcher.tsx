@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef, useState, type FocusEvent, type KeyboardEvent } from 'react';
 import { useTranslations } from 'next-intl';
 import { useThemePreference, type ThemePreference } from '../theme/theme-provider';
 import styles from './theme-switcher.module.scss';
@@ -36,21 +37,91 @@ function ThemeIcon({ theme }: { theme: ThemePreference }) {
 export function ThemeSwitcher() {
   const t = useTranslations('theme');
   const { preference, setPreference } = useThemePreference();
+  const [isOpen, setIsOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const optionRefs = useRef<Array<HTMLButtonElement | null>>([]);
+
+  useEffect(() => {
+    if (isOpen) optionRefs.current[options.indexOf(preference)]?.focus();
+  }, [isOpen, preference]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const closeOnOutsideClick = (event: PointerEvent) => {
+      if (event.target instanceof Node && !rootRef.current?.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('pointerdown', closeOnOutsideClick);
+    return () => document.removeEventListener('pointerdown', closeOnOutsideClick);
+  }, [isOpen]);
+
+  const handleFocusLeave = (event: FocusEvent<HTMLDivElement>) => {
+    if (event.relatedTarget instanceof Node && !rootRef.current?.contains(event.relatedTarget)) {
+      setIsOpen(false);
+    }
+  };
+
+  const handleMenuKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    const currentIndex = optionRefs.current.findIndex((option) => option === event.target);
+    let nextIndex = currentIndex;
+
+    if (event.key === 'ArrowDown') nextIndex = (currentIndex + 1) % options.length;
+    else if (event.key === 'ArrowUp') nextIndex = (currentIndex - 1 + options.length) % options.length;
+    else if (event.key === 'Home') nextIndex = 0;
+    else if (event.key === 'End') nextIndex = options.length - 1;
+    else if (event.key === 'Escape') {
+      event.preventDefault();
+      setIsOpen(false);
+      triggerRef.current?.focus();
+      return;
+    } else return;
+
+    event.preventDefault();
+    optionRefs.current[nextIndex]?.focus();
+  };
+
+  const selectPreference = (nextPreference: ThemePreference) => {
+    setPreference(nextPreference);
+    setIsOpen(false);
+    triggerRef.current?.focus();
+  };
 
   return (
-    <div className={styles.switcher} role="group" aria-label={t('label')} data-preference={preference}>
-      {options.map((option) => (
-        <button
-          key={option}
-          className={styles.option}
-          type="button"
-          aria-label={t(option)}
-          aria-pressed={preference === option}
-          onClick={() => setPreference(option)}
-        >
-          <ThemeIcon theme={option} />
-        </button>
-      ))}
+    <div ref={rootRef} className={styles.switcher} onBlur={handleFocusLeave}>
+      <button
+        ref={triggerRef}
+        className={styles.trigger}
+        type="button"
+        aria-label={`${t('label')}: ${t(preference)}`}
+        aria-haspopup="menu"
+        aria-expanded={isOpen}
+        aria-controls="theme-options"
+        onClick={() => setIsOpen((current) => !current)}
+      >
+        <ThemeIcon theme={preference} />
+      </button>
+      {isOpen && (
+        <div id="theme-options" className={styles.menu} role="menu" aria-label={t('label')} onKeyDown={handleMenuKeyDown}>
+          {options.map((option, index) => (
+            <button
+              key={option}
+              ref={(element) => { optionRefs.current[index] = element; }}
+              className={styles.option}
+              type="button"
+              role="menuitemradio"
+              aria-label={t(option)}
+              aria-checked={preference === option}
+              onClick={() => selectPreference(option)}
+            >
+              <ThemeIcon theme={option} />
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
