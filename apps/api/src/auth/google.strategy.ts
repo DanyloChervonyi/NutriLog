@@ -7,8 +7,6 @@ import { GoogleStateStore } from "./google-state.store.js";
 export type GoogleIdentity = Readonly<{
   googleId: string;
   email: string;
-  firstName: string | null;
-  lastName: string | null;
 }>;
 
 @Injectable()
@@ -45,8 +43,6 @@ export class GoogleStrategy extends PassportStrategy(Strategy, "google") {
     return {
       googleId: profile.id,
       email: email.trim().toLowerCase(),
-      firstName: profile.name?.givenName || null,
-      lastName: profile.name?.familyName || null,
     };
   }
 }

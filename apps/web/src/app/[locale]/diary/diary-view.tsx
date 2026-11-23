@@ -192,6 +192,23 @@ export function DiaryView({ labels }: { labels: Labels }) {
   const units: Array<[keyof typeof totals, string]> = [
     ['calories', labels.calories], ['protein', labels.protein], ['fat', labels.fat], ['carbs', labels.carbs],
   ];
+  const macros = [
+    { key: 'protein', label: labels.protein, grams: Math.max(0, totals.protein), calories: Math.max(0, totals.protein) * 4, color: 'var(--accent)' },
+    { key: 'fat', label: labels.fat, grams: Math.max(0, totals.fat), calories: Math.max(0, totals.fat) * 9, color: 'var(--warning)' },
+    { key: 'carbs', label: labels.carbs, grams: Math.max(0, totals.carbs), calories: Math.max(0, totals.carbs) * 4, color: 'var(--info)' },
+  ];
+  const macroCalories = macros.reduce((sum, macro) => sum + macro.calories, 0);
+  let chartPosition = 0;
+  const chartStops = macroCalories > 0
+    ? macros.filter((macro) => macro.calories > 0).map((macro, index, entries) => {
+      const start = chartPosition;
+      chartPosition = index === entries.length - 1
+        ? 360
+        : chartPosition + (macro.calories / macroCalories) * 360;
+      return `${macro.color} ${start}deg ${chartPosition}deg`;
+    })
+    : ['var(--border-subtle) 0deg 360deg'];
+  const chartBackground = `conic-gradient(${chartStops.join(', ')})`;
 
   return (
     <section className={styles.content}>
@@ -205,13 +222,29 @@ export function DiaryView({ labels }: { labels: Labels }) {
       </header>
       <section className={styles.summary} aria-label={labels.totals}>
         <h2>{labels.totals}{goals ? ` | ${labels.goals}` : ''}</h2>
-        <dl>{units.map(([key, label]) => {
-          const goal = goals?.[key] ?? null;
-          const progress = goal !== null && goal > 0 ? Math.min(100, (totals[key] / goal) * 100) : 0;
-          return <div key={key}><dt>{label}</dt><dd>{totals[key]}{key === 'calories' ? ' kcal' : ' g'}
-            {goal !== null && <><span> / {goal}{key === 'calories' ? ' kcal' : ' g'}</span><progress aria-label={`${label}: ${Math.round(progress)}%`} value={progress} max="100" /><small>{labels.remaining}: {Math.max(0, goal - totals[key])}{key === 'calories' ? ' kcal' : ' g'}</small></>}
-          </dd></div>;
-        })}</dl>
+        <div className={styles.summaryContent}>
+          <div className={styles.macroBreakdown}>
+            <div className={styles.donutChart} role="img" aria-label={labels.macroChart} style={{ background: chartBackground }}>
+              <div><strong>{totals.calories}</strong><span>{labels.calories}</span></div>
+            </div>
+            <ul className={styles.macroLegend}>
+              {macros.map((macro) => (
+                <li key={macro.key} data-macro={macro.key}>
+                  <span>{macro.label}</span>
+                  <strong>{macro.grams} g</strong>
+                  <small>{macroCalories > 0 ? Math.round((macro.calories / macroCalories) * 100) : 0}%</small>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <dl>{units.map(([key, label]) => {
+            const goal = goals?.[key] ?? null;
+            const progress = goal !== null && goal > 0 ? Math.min(100, (totals[key] / goal) * 100) : 0;
+            return <div key={key}><dt>{label}</dt><dd>{totals[key]}{key === 'calories' ? ' kcal' : ' g'}
+              {goal !== null && <><span> / {goal}{key === 'calories' ? ' kcal' : ' g'}</span><progress aria-label={`${label}: ${Math.round(progress)}%`} value={progress} max="100" /><small>{labels.remaining}: {Math.max(0, goal - totals[key])}{key === 'calories' ? ' kcal' : ' g'}</small></>}
+            </dd></div>;
+          })}</dl>
+        </div>
       </section>
       <section ref={addFoodRef} className={styles.addFood}>
         <h2>{labels.addFood}</h2>

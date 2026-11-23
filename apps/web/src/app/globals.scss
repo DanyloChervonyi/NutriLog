@@ -27,7 +27,7 @@
   --content-width: 72rem;
   --header-height: 3.2rem;
   --footer-height: 3.2rem;
-  --bar-surface: #f9fcfb;
+  --bar-surface: #e2efea;
   --icon-color: #16836f;
   accent-color: var(--accent);
   scrollbar-color: var(--border) var(--canvas);
@@ -41,7 +41,7 @@
   --canvas: #0b1c1a;
   --ambient: #215b52;
   --surface: #102522;
-  --bar-surface: #102522;
+  --bar-surface: #16332f;
   --surface-raised: #183431;
   --surface-hover: #20423e;
   --surface-danger: #492a2b;
@@ -71,7 +71,7 @@
     --canvas: #0b1c1a;
     --ambient: #215b52;
     --surface: #102522;
-    --bar-surface: #102522;
+    --bar-surface: #16332f;
     --surface-raised: #183431;
     --surface-hover: #20423e;
     --surface-danger: #492a2b;
@@ -133,8 +133,8 @@ select {
 }
 
 :where(button, input, select, a):focus-visible {
-  outline: 2px solid var(--accent-strong);
-  outline-offset: 3px;
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-strong) 34%, transparent);
 }
 
 ::selection {

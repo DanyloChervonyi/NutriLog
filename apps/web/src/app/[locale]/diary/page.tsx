@@ -15,6 +15,7 @@ export default async function DiaryPage() {
         totals: t('totals'), goals: t('goals'), save: t('save'), remove: t('remove'),
         foodSearchError: t('foodSearchError'), noFoods: t('noFoods'),
         previousDay: t('previousDay'), nextDay: t('nextDay'), remaining: t('remaining'),
+        macroChart: t('macroChart'),
       }} />
     </main>
   );

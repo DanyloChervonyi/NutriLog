@@ -4,6 +4,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import { AppModule } from './app.module.js';
+import { getAllowedWebOrigins } from './config/web-origins.js';
 
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
@@ -13,7 +14,7 @@ async function bootstrap(): Promise<void> {
   app.use(cookieParser());
   app.setGlobalPrefix('api/v1');
   app.enableCors({
-    origin: process.env.WEB_ORIGIN ?? 'http://localhost:3000',
+    origin: getAllowedWebOrigins(process.env.WEB_ORIGIN, isProduction),
     credentials: true,
   });
   app.useGlobalPipes(
@@ -29,7 +30,12 @@ async function bootstrap(): Promise<void> {
   if (!isProduction) {
     const swaggerConfig = new DocumentBuilder()
       .setTitle('NutriLog API')
+      .setDescription('REST API for NutriLog nutrition tracking. Register or log in to receive a bearer access token for protected endpoints.')
       .setVersion('1.0')
+      .addTag('auth', 'Registration, login, sessions, and password reset')
+      .addTag('profile', 'User profile and nutrition targets')
+      .addTag('foods', 'Food catalog and search')
+      .addTag('diary', 'Daily food diary and meal entries')
       .addBearerAuth()
       .build();
     SwaggerModule.setup('api/docs', app, SwaggerModule.createDocument(app, swaggerConfig));

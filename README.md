@@ -46,9 +46,24 @@ pnpm dev:api
 pnpm dev:web
 ```
 
-API доступен на `http://localhost:4000`. При совместном запуске скрипт сам настраивает CORS для выбранного адреса фронтенда. При раздельном запуске веб-клиент использует `localhost`; если порт `3000` занят и Next.js выбрал другой, задайте этот адрес в `WEB_ORIGIN` перед запуском API. Например, в PowerShell для порта `3001`: `$env:WEB_ORIGIN='http://localhost:3001'`.
+API доступен на `http://localhost:4000`. В development API разрешает адреса Next.js на `localhost` и `127.0.0.1` в диапазоне портов `3000–3020`, поэтому смена свободного порта не требует менять CORS вручную. Если запускаете web и API раздельно и порт web отличается от `3000`, задайте `WEB_ORIGIN` перед запуском API: он также используется для возврата после Google OAuth и формирования ссылок сброса пароля. В production разрешён только адрес из `WEB_ORIGIN`.
 
 Проверка API: `http://localhost:4000/api/v1/health`. Документация Swagger: `http://localhost:4000/api/docs`.
+Пошаговые запросы для Postman и Thunder Client: [docs/API-TESTING.md](docs/API-TESTING.md).
+
+### Локальные аккаунты администратора
+
+После применения миграций можно создать два локальных аккаунта администратора. Команда удаляет **всех текущих пользователей** вместе с профилями, дневниками, сессиями и токенами; продукты каталога сохраняются. Скрипт запрещён при `NODE_ENV=production` и требует явного подтверждения.
+
+Укажите в локальном `.env` значения `SEED_DEBUG_ADMIN_PASSWORD`, `SEED_DICTATOR_EMAIL` и `SEED_DICTATOR_PASSWORD`, затем выполните из PowerShell в корне проекта:
+
+```powershell
+$env:RESET_USERS = 'true'
+pnpm --filter @nutrilog/api db:reset-users-and-seed
+Remove-Item Env:RESET_USERS
+```
+
+Первый аккаунт имеет ник `admin` и использует значение `SEED_DEBUG_ADMIN_PASSWORD`; второй — ник `diktator` и использует заданные email и пароль. Пароли хешируются Argon2id. Не запускайте команду на базе с нужными данными.
 
 ## Security baseline
 

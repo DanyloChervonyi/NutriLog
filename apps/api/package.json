@@ -11,7 +11,8 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "db:generate": "prisma generate",
-    "db:migrate": "prisma migrate dev"
+    "db:migrate": "prisma migrate dev",
+    "db:reset-users-and-seed": "nest build && node prisma/seed-users.mjs"
   },
   "dependencies": {
     "@nestjs/common": "^11.2.7",

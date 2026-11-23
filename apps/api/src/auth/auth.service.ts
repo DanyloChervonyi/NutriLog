@@ -23,6 +23,7 @@ import type { AuthPayload, AuthenticatedUser, TokenPair } from './auth.types.js'
 import type { LoginDto } from './dto/login.dto.js';
 import type { RegisterDto } from './dto/register.dto.js';
 import type { GoogleIdentity } from './google.strategy.js';
+import { getAllowedWebOrigins } from '../config/web-origins.js';
 
 const argonOptions = {
   type: argon2.argon2id,
@@ -41,6 +42,7 @@ export class AuthService {
   private readonly accessSecret: string;
   private readonly refreshSecret: string;
   private readonly webOrigin: string;
+  private readonly allowedWebOrigins: ReadonlySet<string>;
   private readonly resetTokenTtlMinutes: number;
   private readonly resendApiKey: string | undefined;
   private readonly emailFrom: string | undefined;
@@ -77,6 +79,10 @@ export class AuthService {
       REFRESH_TOKEN_TTL_DEFAULT,
     );
     this.webOrigin = new URL(config.get<string>('WEB_ORIGIN') ?? 'http://localhost:3000').origin;
+    this.allowedWebOrigins = new Set(getAllowedWebOrigins(
+      config.get<string>('WEB_ORIGIN'),
+      config.get<string>('NODE_ENV') === 'production',
+    ));
     this.resetTokenTtlMinutes = this.getPositiveInteger(
       config,
       'PASSWORD_RESET_TTL_MINUTES',
@@ -95,6 +101,7 @@ export class AuthService {
 
   async register(dto: RegisterDto): Promise<{ payload: AuthPayload; refreshToken: string }> {
     const email = this.normalizeEmail(dto.email);
+    const username = this.normalizeUsername(dto.username);
     const passwordHash = await argon2.hash(dto.password, argonOptions);
     const sessionId = randomUUID();
 
@@ -103,9 +110,8 @@ export class AuthService {
         const user = await transaction.user.create({
           data: {
             email,
+            username,
             passwordHash,
-            firstName: dto.firstName?.trim() || null,
-            lastName: dto.lastName?.trim() || null,
           },
         });
         const tokens = await this.createTokenPair(user.id, sessionId);
@@ -126,7 +132,7 @@ export class AuthService {
       });
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
-        throw new ConflictException('An account with this email already exists');
+        throw new ConflictException('An account with this username or email already exists');
       }
 
       throw error;
@@ -134,14 +140,16 @@ export class AuthService {
   }
 
   async login(dto: LoginDto): Promise<{ payload: AuthPayload; refreshToken: string }> {
+    const identifier = dto.identifier.trim();
     const user = await this.prisma.user.findUnique({
-      where: { email: this.normalizeEmail(dto.email) },
+      where: identifier.includes('@')
+        ? { email: this.normalizeEmail(identifier) }
+        : { username: this.normalizeUsername(identifier) },
       select: {
         id: true,
+        username: true,
         email: true,
         role: true,
-        firstName: true,
-        lastName: true,
         passwordHash: true,
       },
     });
@@ -193,10 +201,9 @@ export class AuthService {
           user = await transaction.user.create({
             data: {
               email: identity.email,
+              username: await this.createGoogleUsername(transaction, identity.email),
               googleId: identity.googleId,
               provider: 'GOOGLE',
-              firstName: identity.firstName,
-              lastName: identity.lastName,
             },
           });
         }
@@ -237,7 +244,7 @@ export class AuthService {
 
       const user = await transaction.user.findUnique({
         where: { id: ticketRecord.userId },
-        select: { id: true, email: true, role: true, firstName: true, lastName: true },
+        select: { id: true, username: true, email: true, role: true },
       });
       if (!user) return null;
 
@@ -396,7 +403,7 @@ export class AuthService {
     const session = await this.prisma.authSession.findUnique({
       where: { id: sessionId },
       include: {
-        user: { select: { id: true, email: true, role: true, firstName: true, lastName: true } },
+        user: { select: { id: true, username: true, email: true, role: true } },
       },
     });
 
@@ -482,16 +489,33 @@ export class AuthService {
       expiresIn: this.accessTokenTtlSeconds,
       user: {
         id: user.id,
+        username: user.username,
         email: user.email,
         role: user.role,
-        firstName: user.firstName,
-        lastName: user.lastName,
       },
     };
   }
 
   private normalizeEmail(email: string): string {
     return email.trim().toLowerCase();
+  }
+
+  private normalizeUsername(username: string): string {
+    return username.trim().toLowerCase();
+  }
+
+  private async createGoogleUsername(
+    transaction: Prisma.TransactionClient,
+    email: string,
+  ): Promise<string> {
+    const base = this.normalizeUsername(email.split('@')[0] ?? 'google').replace(/[^a-z0-9_.-]/g, '').slice(0, 38) || 'google';
+    let username = base;
+    let suffix = 1;
+    while (await transaction.user.findUnique({ where: { username }, select: { id: true } })) {
+      username = `${base.slice(0, 45)}_${suffix}`;
+      suffix += 1;
+    }
+    return username;
   }
 
   private hashToken(token: string): string {
@@ -507,7 +531,7 @@ export class AuthService {
   }
 
   private assertTrustedOrigin(origin: string | undefined): void {
-    if (origin !== this.webOrigin) {
+    if (!origin || !this.allowedWebOrigins.has(origin)) {
       throw new ForbiddenException('Request origin is not allowed');
     }
   }

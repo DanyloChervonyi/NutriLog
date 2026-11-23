@@ -13,8 +13,10 @@ export function SiteFooter() {
     <footer className={styles.footer} aria-label={t('label')}>
       <div className={styles.content}>
         <div className={styles.identity}>
-          <Link className={styles.brand} href="/">NutriLog</Link>
-          <span className={styles.description}>{t('description')}</span>
+          <span className={styles.brand} role="img" aria-label="NutriLog">
+            <img className={styles.lightLogo} src="/images/nutrilog-icon-light.svg" alt="" />
+            <img className={styles.darkLogo} src="/images/nutrilog-icon-dark.svg" alt="" />
+          </span>
         </div>
         <div className={styles.controls}>
           <ThemeSwitcher />

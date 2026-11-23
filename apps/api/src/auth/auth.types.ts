@@ -2,10 +2,9 @@ import type { UserRole } from '../../generated/prisma/enums.js';
 
 export type AuthenticatedUser = Readonly<{
   id: string;
-  email: string;
+  username: string;
+  email: string | null;
   role: UserRole;
-  firstName: string | null;
-  lastName: string | null;
 }>;
 
 export type AuthenticatedRequest = Express.Request & Readonly<{

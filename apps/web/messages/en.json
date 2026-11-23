@@ -51,6 +51,8 @@
     "forgotTitle": "Reset password",
     "resetTitle": "Choose a new password",
     "email": "Email",
+    "username": "Username",
+    "loginIdentifier": "Username or email",
     "password": "Password",
     "newPassword": "New password (at least 12 characters)",
     "signIn": "Sign in",
@@ -67,8 +69,6 @@
     "signingIn": "Signing in…",
     "registerTitle": "Create your NutriLog account",
     "register": "Create account",
-    "firstName": "First name (optional)",
-    "lastName": "Last name (optional)",
     "createAccount": "Create an account"
   },
   "profile": {
@@ -150,7 +150,8 @@
     "noFoods": "No foods found.",
     "previousDay": "Previous day",
     "nextDay": "Next day",
-    "remaining": "Remaining to goal"
+    "remaining": "Remaining to goal",
+    "macroChart": "Calories from protein, fat, and carbohydrates"
   },
   "navigation": {
     "navLabel": "Main navigation",

@@ -50,14 +50,20 @@
 .items input,
 .addForm select,
 .mealActions select {
+  min-width: 0;
   min-height: 2.875rem;
-  border: 1px solid var(--border);
+  border: 0;
   border-radius: var(--radius-control);
   padding: 0 0.75rem;
-  background: var(--canvas);
+  background: var(--surface-raised);
   color: var(--ink);
   font: inherit;
-  transition: border-color 160ms ease, background-color 160ms ease;
+  transition: background-color 160ms ease, box-shadow 160ms ease;
+}
+
+.header input,
+.search input {
+  width: 100%;
 }
 
 .header input:hover,
@@ -66,7 +72,18 @@
 .items input:hover,
 .addForm select:hover,
 .mealActions select:hover {
-  border-color: var(--border-strong);
+  background: var(--surface-hover);
+}
+
+.header input:focus-visible,
+.search input:focus-visible,
+.addForm input:focus-visible,
+.items input:focus-visible,
+.addForm select:focus-visible,
+.mealActions select:focus-visible {
+  outline: none;
+  background: var(--surface-hover);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-strong) 34%, transparent);
 }
 
 .dateNavigation {
@@ -77,18 +94,18 @@
 
 .dateNavigation > button {
   width: 2.875rem;
+  flex: 0 0 2.875rem;
   min-height: 2.875rem;
-  border: 1px solid var(--border);
+  border: 0;
   border-radius: var(--radius-control);
-  background: var(--surface);
+  background: var(--surface-raised);
   color: var(--ink);
   font-size: 1.375rem;
   cursor: pointer;
-  transition: background-color 160ms ease, border-color 160ms ease;
+  transition: background-color 160ms ease, box-shadow 160ms ease;
 }
 
 .dateNavigation > button:hover:not(:disabled) {
-  border-color: var(--accent);
   background: var(--surface-hover);
 }
 
@@ -103,6 +120,106 @@
   border-radius: var(--radius-panel);
   padding: 1.25rem 1.375rem;
   background: linear-gradient(130deg, var(--surface-raised), var(--surface) 60%);
+}
+
+.summaryContent {
+  display: grid;
+  grid-template-columns: minmax(14rem, 0.8fr) minmax(0, 2fr);
+  align-items: center;
+  gap: 1.75rem;
+}
+
+.macroBreakdown {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+}
+
+.donutChart {
+  display: grid;
+  width: 9.5rem;
+  aspect-ratio: 1;
+  flex: 0 0 9.5rem;
+  place-items: center;
+  border-radius: 50%;
+}
+
+.donutChart > div {
+  display: grid;
+  width: 69%;
+  aspect-ratio: 1;
+  align-content: center;
+  justify-items: center;
+  border-radius: 50%;
+  background: var(--surface);
+}
+
+.donutChart strong {
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.donutChart span {
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.macroLegend {
+  display: grid;
+  gap: 0.65rem;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.macroLegend li {
+  display: grid;
+  grid-template-columns: 0.625rem minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+}
+
+.macroLegend li::before {
+  width: 0.625rem;
+  height: 0.625rem;
+  grid-row: 1;
+  grid-column: 1;
+  border-radius: 50%;
+  background: var(--accent);
+  content: '';
+}
+
+.macroLegend li[data-macro='protein']::before {
+  background: var(--accent);
+}
+
+.macroLegend li[data-macro='fat']::before {
+  background: var(--warning);
+}
+
+.macroLegend li[data-macro='carbs']::before {
+  background: var(--info);
+}
+
+.macroLegend li > span {
+  grid-column: 2;
+}
+
+.macroLegend strong {
+  grid-column: 3;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.macroLegend small {
+  grid-column: 4;
+  min-width: 2.5rem;
+  color: var(--muted);
+  text-align: end;
 }
 
 .summary h2 {
@@ -235,28 +352,26 @@
 .mealGroup header button,
 .mealActions button,
 .items button {
-  min-height: 2.625rem;
-  border: 1px solid var(--border);
+  min-height: 2.75rem;
+  border: 0;
   border-radius: var(--radius-control);
   padding: 0 0.875rem;
   background: var(--surface-raised);
   color: var(--ink);
   font: inherit;
   cursor: pointer;
-  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+  transition: background-color 150ms ease, box-shadow 150ms ease, color 150ms ease;
 }
 
 .foodResults button:hover:not(:disabled),
 .mealGroup header button:hover:not(:disabled),
 .mealActions button:hover:not(:disabled),
 .items button:hover:not(:disabled) {
-  border-color: var(--accent);
   background: var(--surface-hover);
 }
 
 .foodResults button[aria-pressed='true'],
 .addForm button {
-  border-color: var(--accent);
   background: var(--accent);
   color: var(--on-accent);
   font-weight: 650;
@@ -272,7 +387,7 @@
   width: 100%;
   min-height: 2.75rem;
   margin-top: 0.5rem;
-  border: 1px solid var(--border);
+  border: 0;
   border-radius: var(--radius-control);
   padding: 0.5rem 0.75rem;
   background: var(--surface);
@@ -305,8 +420,8 @@
 
 .meals {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1.75rem 2.5rem;
+  grid-template-columns: 1fr;
+  gap: 1rem;
   padding-top: 2rem;
 }
 
@@ -320,7 +435,7 @@
 
 .mealGroup > header {
   min-height: 2.75rem;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border-subtle);
   padding-bottom: 0.625rem;
 }
 
@@ -330,7 +445,7 @@
 }
 
 .mealGroup header button {
-  min-height: 2.375rem;
+  min-height: 2.75rem;
   padding-inline: 0.75rem;
   color: var(--accent-strong);
   font-size: 0.8125rem;
@@ -346,7 +461,7 @@
 }
 
 .mealActions select {
-  min-height: 2.375rem;
+  min-height: 2.75rem;
   padding-inline: 0.625rem;
 }
 
@@ -381,13 +496,13 @@
 
 .items input {
   width: 5.5rem;
-  min-height: 2.5rem;
+  min-height: 2.75rem;
   padding-inline: 0.5rem;
 }
 
 .items button,
 .mealActions button {
-  min-height: 2.5rem;
+  min-height: 2.75rem;
   padding-inline: 0.625rem;
   font-size: 0.8125rem;
 }
@@ -413,6 +528,22 @@
   text-underline-offset: 0.2em;
 }
 
+@media (max-width: 1024px) {
+  .summaryContent {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .summary dl {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    row-gap: 1.25rem;
+  }
+
+  .macroBreakdown {
+    justify-content: flex-start;
+  }
+}
+
 @media (max-width: 760px) {
   .page {
     padding: 1.75rem 1rem 3rem;
@@ -433,16 +564,6 @@
 
   .dateNavigation input {
     width: 100%;
-  }
-
-  .summary dl {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    row-gap: 1.25rem;
-  }
-
-  .meals {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
   }
 
   .items li {
@@ -467,6 +588,15 @@
 
   .summary dd {
     font-size: 1.0625rem;
+  }
+
+  .macroBreakdown {
+    gap: 0.875rem;
+  }
+
+  .donutChart {
+    width: 8rem;
+    flex-basis: 8rem;
   }
 
   .addForm > span {

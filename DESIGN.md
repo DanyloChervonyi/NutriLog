@@ -5,7 +5,7 @@ description: A focused nutrition journal with system-aware light and dark surfac
 colors:
   background: "#F3F8F6"
   ambient: "#D8EEE7"
-  bar-surface: "#F9FCFB"
+  bar-surface: "#E2EFEA"
   surface: "#FFFFFF"
   raised: "#F9FCFB"
   surface-danger: "#FFF0EF"
@@ -23,12 +23,11 @@ colors:
   danger-strong: "#8D3036"
   warning: "#805711"
   info: "#246D7B"
-  bar-surface: "#102522"
-  icon: "#9AE8D7"
 darkColors:
   background: "#0B1C1A"
   ambient: "#215B52"
   surface: "#102522"
+  bar-surface: "#16332F"
   raised: "#183431"
   surface-danger: "#492A2B"
   border: "#35534F"
@@ -39,7 +38,7 @@ darkColors:
   primary: "#49CDB2"
   primary-strong: "#9AE8D7"
   primary-soft: "#1C4842"
-  icon: "#16836F"
+  icon: "#9AE8D7"
   on-primary: "#06211C"
   danger: "#FF9995"
   danger-strong: "#FFC0BC"
@@ -87,7 +86,7 @@ NutriLog is a calm nutrition journal with a bright, low-glare default and an opt
 
 ## Colors
 
-The default system-aware light canvas is soft and neutral, with white panels and clear borders. The optional dark theme uses the existing near-black canvas and deep teal surfaces. Both themes retain the same blue-shifted green accent family, with contrast-adjusted token values for readable text and controls. Danger, warning, and information each have a separate semantic color. Controls, selection, focus, and progress use semantic tokens; route styles do not carry independent hex values.
+The default system-aware light canvas is soft and neutral, with white panels and clear borders. The optional dark theme uses the existing near-black canvas and deep teal surfaces. Fixed navigation bars use a distinct teal-tinted surface in both themes so they remain visible above the page. Both themes retain the same blue-shifted green accent family, with contrast-adjusted token values for readable text and controls. Danger, warning, and information each have a separate semantic color. Controls, selection, focus, and progress use semantic tokens; route styles do not carry independent hex values.
 
 ## Typography
 
@@ -95,7 +94,7 @@ Use Noto Sans for a consistent, readable interface across Latin and Cyrillic loc
 
 ## Layout
 
-The public landing pairs the offer and registration action with a clearly labeled sample of the daily nutrition summary. The signed-in content uses a centered maximum width of 72rem. Diary summaries and meal lists use a compact desktop grid, then collapse to one column on narrow screens. Catalog results keep each product name, serving basis, and nutrition values together. Auth and profile forms stay narrow and single-column. Main mobile content has at least 1rem side padding; controls target 44px or more for touch.
+The public landing pairs the offer and registration action with a clearly labeled sample of the daily nutrition summary. The signed-in content uses a centered maximum width of 72rem. The diary summary pairs a circular calorie-share view of protein, fat, and carbohydrates with aligned daily totals; meal groups stack vertically and use headings as separators. Catalog results keep each product name, serving basis, and nutrition values together. Auth and profile forms stay narrow and single-column. Main mobile content has at least 1rem side padding; controls target 44px or more for touch.
 
 ## Elevation & Depth
 
@@ -109,7 +108,7 @@ Inputs, buttons, and result panels use consistent rounded corners: 0.5rem for co
 
 ### Foundational visual states
 
-Interactive controls expose hover, focus-visible, active, disabled, loading, and error states. Focus uses a visible primary-color outline. Disabled controls reduce contrast without becoming unreadable. Errors use both text and danger color; loading and empty states preserve their place in the flow.
+Interactive controls expose hover, focus-visible, active, disabled, loading, and error states. Focus uses a soft, visible primary-color halo without adding a hard control border. Disabled controls reduce contrast without becoming unreadable. Errors use both text and danger color; loading and empty states preserve their place in the flow.
 
 ### Buttons and actions
 
@@ -129,7 +128,7 @@ The theme control is a borderless icon dropdown for system, light, and dark. Its
 
 ### Iconography
 
-Use existing text labels and native date controls; do not introduce emoji or decorative Unicode as an icon system.
+Use crisp inline SVGs with the same rounded stroke style as the footer controls for profile and sign-out actions. Icon-only actions keep localized accessible names and tooltips; do not use emoji or decorative Unicode as icons.
 
 ### Motion
 

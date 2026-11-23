@@ -39,9 +39,9 @@
 
 | Component | Default | Hover | Focus | Active | Disabled | Busy | Error |
 |---|---|---|---|---|---|---|---|
-| Button | labeled action | surface change | visible outline | pressed surface | subdued, legible | action-specific label remains | alert text nearby |
-| Input | labeled value | border emphasis | visible outline | n/a | subdued | form pending state | inline/form alert |
-| Search | empty or query | border emphasis | visible outline | n/a | n/a | loading status | error status or no-results message |
+| Button | labeled action | surface change | soft accent halo, no border | pressed surface | subdued, legible | action-specific label remains | alert text nearby |
+| Input | labeled value | tonal fill change | soft accent halo, no border | n/a | subdued | form pending state | inline/form alert |
+| Search | empty or query | tonal fill change | soft accent halo, no border | n/a | n/a | loading status | error status or no-results message |
 | Diary list | meal items | row emphasis | controls focusable | selected food | mutation controls disabled | loading status | alert with retry path by re-submission |
 
 ## Dataset navigation
@@ -67,9 +67,9 @@
 - The locale home route is a public landing page with registration, sign-in, and catalog actions. After the client session is restored, an authenticated visitor is redirected to the diary.
 - The NutriLog brand link returns to the locale home route.
 - The header and footer stay fixed to the viewport at the same reduced height while the main content scrolls. The footer contains the icon-only locale and theme controls on every localized route; mobile navigation opens from a compact menu button.
-- Top navigation links to diary and catalog; profile is shown for an authenticated user. Auth actions depend on session state.
+- Top navigation links to diary and catalog; authenticated users get adjacent profile and sign-out icon controls with accessible names. Auth actions depend on session state.
 - Locale switcher exposes Russian, Ukrainian, and English.
-- Diary summary and meals use multiple columns on desktop and collapse to one column on mobile.
+- Diary summary places the macro calorie-share chart beside daily totals on desktop and stacks them on mobile; meal groups stay in a single vertical list at all widths.
 - Food results keep product name and per-100-g values together; buttons and fields remain usable at narrow widths.
 
 ## Async and resilience

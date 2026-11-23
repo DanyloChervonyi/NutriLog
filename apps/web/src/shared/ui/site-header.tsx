@@ -48,7 +48,9 @@ export function SiteHeader({ labels }: { labels: Labels }) {
   }, [mobileMenuOpen]);
 
   return <header ref={headerRef} className={styles.header}>
-    <Link className={styles.brand} href="/">NutriLog</Link>
+    <Link className={styles.brand} href="/" aria-label="NutriLog — главная">
+      <img src="/images/nutrilog-wordmark-clean.svg" alt="" />
+    </Link>
     <nav
       ref={navRef}
       id="site-navigation"
@@ -64,11 +66,17 @@ export function SiteHeader({ labels }: { labels: Labels }) {
     >
       <Link href="/diary" onClick={() => setMobileMenuOpen(false)}>{labels.diary}</Link>
       <Link href="/catalog" onClick={() => setMobileMenuOpen(false)}>{labels.catalog}</Link>
-      {accessToken && <Link href="/profile" onClick={() => setMobileMenuOpen(false)}>{labels.profile}</Link>}
     </nav>
     <div ref={actionsRef} className={styles.actions}>
       {ready && (accessToken
-        ? <button type="button" disabled={signOut.isPending} onClick={() => signOut.mutate()}>{labels.signOut}</button>
+        ? <>
+          <Link className={styles.iconAction} href="/profile" aria-label={labels.profile} title={labels.profile}>
+            <ProfileIcon />
+          </Link>
+          <button className={styles.iconAction} type="button" aria-label={labels.signOut} title={labels.signOut} disabled={signOut.isPending} onClick={() => signOut.mutate()}>
+            <SignOutIcon />
+          </button>
+        </>
         : <><Link href="/login">{labels.signIn}</Link><Link href="/register">{labels.register}</Link></>)}
     </div>
     <button
@@ -83,4 +91,22 @@ export function SiteHeader({ labels }: { labels: Labels }) {
       <span className={styles.menuIcon} aria-hidden="true" />
     </button>
   </header>;
+}
+
+function ProfileIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <circle cx="12" cy="8" r="3.5" />
+      <path d="M4.5 20a7.5 7.5 0 0 1 15 0" />
+    </svg>
+  );
+}
+
+function SignOutIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M10 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h4" />
+      <path d="m13 8 4 4-4 4m4-4H8" />
+    </svg>
+  );
 }

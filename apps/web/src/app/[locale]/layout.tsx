@@ -40,7 +40,7 @@ export async function generateMetadata({
 
   const t = await getTranslations({ locale, namespace: 'metadata' });
 
-  return { title: t('title'), description: t('description') };
+  return { title: t('title'), description: t('description'), icons: { icon: '/images/nutrilog-mark-green.svg' } };
 }
 
 export default async function LocaleLayout({ children, params }: LocaleLayoutProps) {
