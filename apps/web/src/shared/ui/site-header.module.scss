@@ -24,6 +24,7 @@
   justify-content: center;
   min-height: 2.4rem;
   padding: 0.2rem 0.5rem;
+  background: color-mix(in srgb, var(--bar-surface) 82%, white 18%);
   border-radius: var(--radius-control);
   color: var(--ink);
   text-decoration: none;
@@ -35,10 +36,14 @@
   }
 }
 
-:global(:root[data-theme='dark']) .brand { background: #e8f5f1; }
+:global(:root[data-theme='dark']) .brand {
+  background: color-mix(in srgb, var(--bar-surface) 88%, var(--accent) 12%);
+}
 
 @media (prefers-color-scheme: dark) {
-  :global(:root[data-theme='system']) .brand { background: #e8f5f1; }
+  :global(:root[data-theme='system']) .brand {
+    background: color-mix(in srgb, var(--bar-surface) 88%, var(--accent) 12%);
+  }
 }
 
 .nav,

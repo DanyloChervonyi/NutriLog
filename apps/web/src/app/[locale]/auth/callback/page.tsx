@@ -13,11 +13,10 @@ export default function GoogleCallbackPage() {
   const router = useRouter();
   const { setAccessToken } = useAuth();
   const exchanged = useRef(false);
-  const exchange = useMutation({
+  const { mutateAsync, isPending, isError } = useMutation({
     mutationFn: (ticket: string) => ticket
       ? authRequest<AuthResponse>('/oauth/exchange', { ticket })
       : Promise.reject(new Error('Missing OAuth ticket')),
-    onSuccess: (result) => { setAccessToken(result.accessToken); router.replace('/diary'); },
   });
 
   useEffect(() => {
@@ -25,12 +24,20 @@ export default function GoogleCallbackPage() {
     window.history.replaceState(null, '', window.location.pathname);
     if (exchanged.current) return;
     exchanged.current = true;
-    exchange.mutate(ticket ?? '');
-  }, [exchange, router]);
+    void mutateAsync(ticket ?? '').then((result) => {
+      setAccessToken(result.accessToken);
+      router.replace('/diary');
+    }).catch(() => undefined);
+  }, [mutateAsync, router, setAccessToken]);
 
   return (
     <main className={styles.page}>
-      <p role="status">{exchange.isError ? t('googleFailed') : t('signingIn')}</p>
+      <section className={styles.callbackCard} aria-live="polite">
+        {isPending && <span className={styles.loadingSpinner} role="status" aria-label={t('signingIn')} />}
+        <p className={isError ? styles.callbackError : styles.callbackStatus} role={isError ? 'alert' : 'status'}>
+          {isError ? t('googleFailed') : t('signingIn')}
+        </p>
+      </section>
     </main>
   );
 }

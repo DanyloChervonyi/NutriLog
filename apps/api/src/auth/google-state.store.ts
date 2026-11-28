@@ -1,5 +1,6 @@
 import { randomBytes, timingSafeEqual } from 'node:crypto';
 import type { Request } from 'express';
+import { getAllowedWebOrigins } from '../config/web-origins.js';
 
 type OAuthMetadata = Readonly<{ authorizationURL: string; tokenURL: string; clientID: string }>;
 type StoreCallback = (error: Error | null, state: unknown) => void;
@@ -7,6 +8,7 @@ type VerifyCallback = (error: Error | null, valid: boolean, state: unknown) => v
 
 const STATE_COOKIE = 'nutrilog_google_state';
 const LOCALE_COOKIE = 'nutrilog_google_locale';
+const RETURN_ORIGIN_COOKIE = 'nutrilog_google_return_origin';
 
 export class GoogleStateStore {
   store(req: Request, callback: StoreCallback): void;
@@ -46,6 +48,17 @@ export class GoogleStateStore {
       path: '/api/v1/auth/google',
       maxAge: 5 * 60 * 1000,
     });
+    const configuredOrigin = new URL(process.env.WEB_ORIGIN ?? 'http://localhost:3000').origin;
+    const requestedOrigin = typeof req.query.returnOrigin === 'string' ? req.query.returnOrigin : '';
+    const allowedOrigins = getAllowedWebOrigins(process.env.WEB_ORIGIN, process.env.NODE_ENV === 'production');
+    const returnOrigin = allowedOrigins.includes(requestedOrigin) ? requestedOrigin : configuredOrigin;
+    response.cookie(RETURN_ORIGIN_COOKIE, returnOrigin, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/api/v1/auth/google',
+      maxAge: 5 * 60 * 1000,
+    });
     callback(null, state);
   }
 
@@ -71,6 +84,12 @@ export class GoogleStateStore {
       path: '/api/v1/auth/google',
     });
     req.res?.clearCookie(LOCALE_COOKIE, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/api/v1/auth/google',
+    });
+    req.res?.clearCookie(RETURN_ORIGIN_COOKIE, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',

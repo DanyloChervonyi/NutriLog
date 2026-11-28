@@ -3,6 +3,7 @@ import { hasLocale, NextIntlClientProvider } from 'next-intl';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { Noto_Sans } from 'next/font/google';
+import Script from 'next/script';
 import '@unocss/reset/tailwind.css';
 import { Providers } from '../providers';
 import { SiteFooter } from '../../shared/ui/site-footer';
@@ -55,10 +56,9 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
 
   return (
     <html lang={locale} data-theme="system" suppressHydrationWarning>
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: themeBootstrap }} />
-      </head>
+      <head />
       <body className={notoSans.variable}>
+        <Script id="theme-bootstrap" strategy="beforeInteractive">{themeBootstrap}</Script>
         <NextIntlClientProvider>
           <Providers>
             <SiteHeader labels={{

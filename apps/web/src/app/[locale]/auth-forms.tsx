@@ -98,7 +98,18 @@ export function AuthForms({ mode, title, token = '' }: AuthFormsProps) {
             <input type="password" autoComplete={mode === 'login' ? 'current-password' : 'new-password'} minLength={mode === 'login' ? 1 : 12} maxLength={128} {...form.register('password')} />
           </label>
           <button className={styles.button} disabled={mutation.isPending} type="submit">{mode === 'login' ? t('signIn') : t('register')}</button>
-          <a className={`${styles.button} ${styles.secondary}`} href={`${googleLoginUrl}?locale=${locale}`}>
+          <a
+            className={`${styles.button} ${styles.secondary}`}
+            href={`${googleLoginUrl}?locale=${locale}`}
+            onClick={(event) => {
+              if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+              event.preventDefault();
+              const url = new URL(googleLoginUrl);
+              url.searchParams.set('locale', locale);
+              url.searchParams.set('returnOrigin', window.location.origin);
+              window.location.assign(url.toString());
+            }}
+          >
             <GoogleIcon />
             {t('googleSignIn')}
           </a>

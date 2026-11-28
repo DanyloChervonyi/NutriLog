@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type CSSProperties } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAutoAnimate } from '@formkit/auto-animate/react';
 import { useForm } from 'react-hook-form';
@@ -38,6 +38,7 @@ export function DiaryView({ labels }: { labels: Labels }) {
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [selectedFood, setSelectedFood] = useState<Food | null>(null);
+  const [addFoodOpen, setAddFoodOpen] = useState(false);
   const [gramEdits, setGramEdits] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -50,7 +51,7 @@ export function DiaryView({ labels }: { labels: Labels }) {
       window.sessionStorage.removeItem('nutrilog_pending_food');
       try {
         const parsed = pendingFoodSchema.safeParse(JSON.parse(raw));
-        if (parsed.success) { setSelectedFood(parsed.data as Food); setQuery(parsed.data.name); }
+        if (parsed.success) { setSelectedFood(parsed.data as Food); setQuery(parsed.data.name); setAddFoodOpen(true); }
       } catch { /* Ignore malformed product handoff data. */ }
     });
   }, []);
@@ -189,26 +190,13 @@ export function DiaryView({ labels }: { labels: Labels }) {
   const diary = diaryQuery.data;
   const totals = diary?.totals ?? { calories: 0, protein: 0, fat: 0, carbs: 0 };
   const goals = diary?.goals;
-  const units: Array<[keyof typeof totals, string]> = [
-    ['calories', labels.calories], ['protein', labels.protein], ['fat', labels.fat], ['carbs', labels.carbs],
-  ];
   const macros = [
-    { key: 'protein', label: labels.protein, grams: Math.max(0, totals.protein), calories: Math.max(0, totals.protein) * 4, color: 'var(--accent)' },
-    { key: 'fat', label: labels.fat, grams: Math.max(0, totals.fat), calories: Math.max(0, totals.fat) * 9, color: 'var(--warning)' },
-    { key: 'carbs', label: labels.carbs, grams: Math.max(0, totals.carbs), calories: Math.max(0, totals.carbs) * 4, color: 'var(--info)' },
+    { key: 'protein', label: labels.protein, value: totals.protein, goal: goals?.protein ?? null },
+    { key: 'fat', label: labels.fat, value: totals.fat, goal: goals?.fat ?? null },
+    { key: 'carbs', label: labels.carbs, value: totals.carbs, goal: goals?.carbs ?? null },
   ];
-  const macroCalories = macros.reduce((sum, macro) => sum + macro.calories, 0);
-  let chartPosition = 0;
-  const chartStops = macroCalories > 0
-    ? macros.filter((macro) => macro.calories > 0).map((macro, index, entries) => {
-      const start = chartPosition;
-      chartPosition = index === entries.length - 1
-        ? 360
-        : chartPosition + (macro.calories / macroCalories) * 360;
-      return `${macro.color} ${start}deg ${chartPosition}deg`;
-    })
-    : ['var(--border-subtle) 0deg 360deg'];
-  const chartBackground = `conic-gradient(${chartStops.join(', ')})`;
+  const caloriesGoal = goals?.calories ?? null;
+  const calorieProgress = caloriesGoal && caloriesGoal > 0 ? totals.calories / caloriesGoal : -1;
 
   return (
     <section className={styles.content}>
@@ -216,39 +204,35 @@ export function DiaryView({ labels }: { labels: Labels }) {
         <h1>{labels.title}</h1>
         <div className={styles.dateNavigation}>
           <button type="button" aria-label={labels.previousDay} onClick={() => changeDiaryDate(date, -1, setDate)}>‹</button>
-          <label>{labels.date}<input type="date" required max={localDate()} value={date} onChange={(event) => { if (event.target.value) setDate(event.target.value); }} /></label>
+          <label>{labels.date}<input type="date" required max={localDate()} value={date} onClick={(event) => event.currentTarget.showPicker()} onChange={(event) => { if (event.target.value) setDate(event.target.value); }} /></label>
           <button type="button" aria-label={labels.nextDay} disabled={date >= localDate()} onClick={() => changeDiaryDate(date, 1, setDate)}>›</button>
         </div>
       </header>
       <section className={styles.summary} aria-label={labels.totals}>
-        <h2>{labels.totals}{goals ? ` | ${labels.goals}` : ''}</h2>
-        <div className={styles.summaryContent}>
-          <div className={styles.macroBreakdown}>
-            <div className={styles.donutChart} role="img" aria-label={labels.macroChart} style={{ background: chartBackground }}>
-              <div><strong>{totals.calories}</strong><span>{labels.calories}</span></div>
-            </div>
-            <ul className={styles.macroLegend}>
-              {macros.map((macro) => (
-                <li key={macro.key} data-macro={macro.key}>
-                  <span>{macro.label}</span>
-                  <strong>{macro.grams} g</strong>
-                  <small>{macroCalories > 0 ? Math.round((macro.calories / macroCalories) * 100) : 0}%</small>
-                </li>
-              ))}
-            </ul>
+        <h2>{labels.totals}</h2>
+        <div className={styles.progressRings}>
+          <div className={styles.calorieRing} role="img" aria-label={`${labels.calories}: ${totals.calories}${caloriesGoal ? ` / ${caloriesGoal} kcal` : ' kcal'}`} style={ringStyle(calorieProgress)}>
+            <div><strong>{totals.calories}</strong><span>{labels.calories}</span></div>
           </div>
-          <dl>{units.map(([key, label]) => {
-            const goal = goals?.[key] ?? null;
-            const progress = goal !== null && goal > 0 ? Math.min(100, (totals[key] / goal) * 100) : 0;
-            return <div key={key}><dt>{label}</dt><dd>{totals[key]}{key === 'calories' ? ' kcal' : ' g'}
-              {goal !== null && <><span> / {goal}{key === 'calories' ? ' kcal' : ' g'}</span><progress aria-label={`${label}: ${Math.round(progress)}%`} value={progress} max="100" /><small>{labels.remaining}: {Math.max(0, goal - totals[key])}{key === 'calories' ? ' kcal' : ' g'}</small></>}
-            </dd></div>;
-          })}</dl>
+          <div className={styles.macroRings}>
+            {macros.map((macro) => {
+              const progress = macro.goal && macro.goal > 0 ? macro.value / macro.goal : -1;
+              return <div className={styles.macroRingGroup} key={macro.key}>
+                <div className={styles.macroRing} role="img" aria-label={`${macro.label}: ${macro.value} / ${macro.goal ?? '—'} g`} style={ringStyle(progress)}>
+                  <div><strong>{Math.round(macro.value)}</strong><span>g</span></div>
+                </div>
+                <span>{macro.label}</span>
+              </div>;
+            })}
+          </div>
         </div>
       </section>
       <section ref={addFoodRef} className={styles.addFood}>
-        <h2>{labels.addFood}</h2>
-        <label className={styles.search}>{labels.search}<input placeholder={labels.searchHint} value={query} onChange={(event) => {
+        <button className={styles.addFoodToggle} type="button" aria-expanded={addFoodOpen} onClick={() => setAddFoodOpen((open) => !open)}>
+          <span aria-hidden="true">{addFoodOpen ? '−' : '+'}</span>{labels.addFood}
+        </button>
+        {addFoodOpen && <>
+        <label className={styles.search}><span className={styles.visuallyHidden}>{labels.search}</span><input aria-label={labels.search} placeholder={labels.searchHint} value={query} onChange={(event) => {
           const value = event.target.value;
           setQuery(value);
           setSelectedFood(null);
@@ -272,6 +256,7 @@ export function DiaryView({ labels }: { labels: Labels }) {
           </select>
           <button type="submit" disabled={saving}>{labels.add}</button>
         </form>}
+        </>}
       </section>
       {error && <p role="alert">{error}</p>}
       <section className={styles.meals}>
@@ -307,6 +292,19 @@ export function DiaryView({ labels }: { labels: Labels }) {
 
 function authHeader(token: string) {
   return { Authorization: `Bearer ${token}` };
+}
+
+function ringStyle(progress: number): CSSProperties {
+  const boundedProgress = Math.max(0, Math.min(1, progress));
+  const fill = Math.round(boundedProgress * 100);
+  const color = progress < 0
+    ? 'var(--border-strong)'
+    : progress > 1.07
+      ? 'var(--danger)'
+      : progress <= 0.5
+      ? `color-mix(in srgb, #e45d65 ${100 - boundedProgress * 200}%, #e8bd4c ${boundedProgress * 200}%)`
+      : `color-mix(in srgb, #e8bd4c ${100 - (boundedProgress - 0.5) * 200}%, #42b99a ${(boundedProgress - 0.5) * 200}%)`;
+  return { background: `conic-gradient(${color} ${fill}%, var(--ring-track) ${fill}% 100%)` };
 }
 
 function localDate() {

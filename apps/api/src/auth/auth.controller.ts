@@ -24,6 +24,7 @@ import { ResetPasswordDto } from './dto/reset-password.dto.js';
 import { ExchangeOAuthTicketDto } from './dto/exchange-oauth-ticket.dto.js';
 import { GoogleConfiguredGuard } from './google-configured.guard.js';
 import type { GoogleIdentity } from './google.strategy.js';
+import { getAllowedWebOrigins } from '../config/web-origins.js';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -80,7 +81,13 @@ export class AuthController {
     const ticket = await this.authService.loginWithGoogle(request.user);
     const locale = request.cookies?.nutrilog_google_locale;
     const safeLocale = locale === 'uk' || locale === 'en' ? locale : 'ru';
-    const callbackUrl = new URL(`/${safeLocale}/auth/callback`, process.env.WEB_ORIGIN ?? 'http://localhost:3000');
+    const fallbackOrigin = new URL(process.env.WEB_ORIGIN ?? 'http://localhost:3000').origin;
+    const requestedOrigin = request.cookies?.nutrilog_google_return_origin;
+    const allowedOrigins = getAllowedWebOrigins(process.env.WEB_ORIGIN, process.env.NODE_ENV === 'production');
+    const returnOrigin = typeof requestedOrigin === 'string' && allowedOrigins.includes(requestedOrigin)
+      ? requestedOrigin
+      : fallbackOrigin;
+    const callbackUrl = new URL(`/${safeLocale}/auth/callback`, returnOrigin);
     callbackUrl.hash = `ticket=${ticket}`;
     response.redirect(callbackUrl.toString());
   }
